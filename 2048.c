@@ -261,11 +261,9 @@ bool condenseRow(u_int16_t row[SIZE]) {
 }
 
 int main(void) {
-	//u_int16_t board[4][4] = {{2,2,2,2},{2,2,2,2},{2,2,4,4},{8,8,8,4}};
 	u_int16_t board[SIZE][SIZE];
 	char c;
 	bool success;
-
 
 	memset(board,0,sizeof(board));
 	addRandom(board);
