@@ -15,7 +15,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-const int8_t SIZE=4;
+const int8_t SIZE=3;
 
 bool condenseRow(u_int16_t row[SIZE]);
 
@@ -76,17 +76,16 @@ int8_t rowLength(u_int16_t row[SIZE]) {
 	return len;
 }
 
-void rotateBoard(u_int16_t board[SIZE][SIZE]){
-	int8_t i, mi;
-	int8_t j, mj;
-
-	for (i = 0, mi = SIZE; i < mi--; i++) {
-		for (j = 0, mj = SIZE; j < mj--; j++) {
-			u_int16_t tmp = board[ i][ j];
-			board[ i][ j] = board[mj][ i];
-			board[mj][ i] = board[mi][mj];
-			board[mi][mj] = board[ j][mi];
-			board[ j][mi] = tmp;
+void rotateBoard(u_int16_t a[SIZE][SIZE]) {
+	int8_t i,j,n=SIZE;
+	u_int16_t tmp;
+	for (i=0; i<n/2; i++){
+		for (j=i; j<n-i-1; j++){
+			tmp=a[i][j];
+			a[i][j]=a[j][n-i-1];
+			a[j][n-i-1]=a[n-i-1][n-j-1];
+			a[n-i-1][n-j-1]=a[n-j-1][i];
+			a[n-j-1][i]=tmp;
 		}
 	}
 }
@@ -100,7 +99,7 @@ bool moveUp(u_int16_t board[SIZE][SIZE]) {
 	return success;
 }
 
-bool moveRight(u_int16_t board[SIZE][SIZE]) {
+bool moveLeft(u_int16_t board[SIZE][SIZE]) {
 	bool success;
 	rotateBoard(board);
 	success = moveUp(board);
@@ -120,7 +119,7 @@ bool moveDown(u_int16_t board[SIZE][SIZE]) {
 	return success;
 }
 
-bool moveLeft(u_int16_t board[SIZE][SIZE]) {
+bool moveRight(u_int16_t board[SIZE][SIZE]) {
 	bool success;
 	rotateBoard(board);
 	rotateBoard(board);
