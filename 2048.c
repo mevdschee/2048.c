@@ -20,8 +20,7 @@ const int8_t SIZE=4;
 bool condenseRow(u_int16_t row[SIZE]);
 
 void getColor(u_int16_t value, char *color, size_t length) {
-	u_int16_t tmp,c;
-	c = 40;
+	u_int16_t c = 40;
 	if (value > 0) while (value >>= 1) c++;
 	snprintf(color,length,"\033[0;41;%dm",c);
 }
@@ -69,7 +68,7 @@ void drawBoard(u_int16_t board[SIZE][SIZE]) {
 }
 
 int8_t rowLength(u_int16_t row[SIZE]) {
-	int8_t x,i,len;
+	int8_t len;
 	len = SIZE;
 	while (len>0 && row[len-1]==0) {
 		len--;
