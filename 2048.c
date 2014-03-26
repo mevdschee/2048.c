@@ -273,7 +273,6 @@ int main(void) {
 	setBufferedInput(false);
 	do {
 		c=getchar();
-		drawBoard(board);
 		switch(c) {
 			case 68: success = moveLeft(board);  break;
 			case 67: success = moveRight(board); break;
@@ -282,13 +281,14 @@ int main(void) {
 			default: success = false;
 		}
 		if (success) {
-			addRandom(board);
-			if (gameEnded(board)) break;
 			drawBoard(board);
+			usleep(150000);
+			addRandom(board);
+			drawBoard(board);
+			if (gameEnded(board)) break;
 		}
 	} while (c!='q');
 	setBufferedInput(true);
-	drawBoard(board);
 
 	printf("GAME OVER\n");
 
