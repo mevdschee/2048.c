@@ -15,9 +15,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-const int8_t SIZE=3;
-
-bool condenseRow(u_int16_t row[SIZE]);
+const int8_t SIZE=4;
 
 void getColor(u_int16_t value, char *color, size_t length) {
 	u_int16_t c = 40;
@@ -64,28 +62,67 @@ void drawBoard(u_int16_t board[SIZE][SIZE]) {
 		}
 		printf("|\n");
 	}
-	printf("\nPress arrow keys or 'q' to quit\n\n");
+	printf("\nPress ararray keys or 'q' to quit\n\n");
 }
 
-int8_t rowLength(u_int16_t row[SIZE]) {
+int8_t arrayLength(u_int16_t array[SIZE]) {
 	int8_t len;
 	len = SIZE;
-	while (len>0 && row[len-1]==0) {
+	while (len>0 && array[len-1]==0) {
 		len--;
 	}
 	return len;
 }
 
-void rotateBoard(u_int16_t a[SIZE][SIZE]) {
+bool shiftArray(u_int16_t array[SIZE],int8_t start,int8_t length) {
+	bool success = false;
+	int8_t x,i;
+	for (x=start;x<length-1;x++) {
+    	while (array[x]==0) {
+			for (i=x;i<length-1;i++) {
+				array[i] = array[i+1];
+				array[i+1] = 0;
+				length = arrayLength(array);
+				success = true;
+			}
+		}
+	}
+	return success;
+}
+
+bool collapseArray(u_int16_t array[SIZE],int8_t x) {
+	bool success = false;
+	if (array[x] == array[x+1]) {
+		array[x] *= 2;
+		array[x+1] = 0;
+		success = true;
+	}
+	return success;
+}
+
+bool condenseArray(u_int16_t array[SIZE]) {
+	bool success = false;
+	int8_t x,length;
+	length = arrayLength(array);
+	for (x=0;x<length-1;x++) {
+		length = arrayLength(array);
+		success |= shiftArray(array,x,length);
+		length = arrayLength(array);
+		success |= collapseArray(array,x);
+	}
+	return success;
+}
+
+void rotateBoard(u_int16_t board[SIZE][SIZE]) {
 	int8_t i,j,n=SIZE;
 	u_int16_t tmp;
 	for (i=0; i<n/2; i++){
 		for (j=i; j<n-i-1; j++){
-			tmp=a[i][j];
-			a[i][j]=a[j][n-i-1];
-			a[j][n-i-1]=a[n-i-1][n-j-1];
-			a[n-i-1][n-j-1]=a[n-j-1][i];
-			a[n-j-1][i]=tmp;
+			tmp = board[i][j];
+			board[i][j] = board[j][n-i-1];
+			board[j][n-i-1] = board[n-i-1][n-j-1];
+			board[n-i-1][n-j-1] = board[n-j-1][i];
+			board[n-j-1][i] = tmp;
 		}
 	}
 }
@@ -94,7 +131,7 @@ bool moveUp(u_int16_t board[SIZE][SIZE]) {
 	bool success = false;
 	int8_t x;
 	for (x=0;x<SIZE;x++) {
-		success |= condenseRow(board[x]);
+		success |= condenseArray(board[x]);
 	}
 	return success;
 }
@@ -217,45 +254,6 @@ void setBufferedInput(bool enable) {
 		// set the new state
 		enabled = false;
 	}
-}
-
-bool shiftRow(u_int16_t row[SIZE],int8_t start,int8_t length) {
-	bool success = false;
-	int8_t x,i;
-	for (x=start;x<length-1;x++) {
-    	while (row[x]==0) {
-			for (i=x;i<length-1;i++) {
-				row[i] = row[i+1];
-				row[i+1] = 0;
-				length = rowLength(row);
-				success = true;
-			}
-		}
-	}
-	return success;
-}
-
-bool collapseRow(u_int16_t row[SIZE],int8_t x) {
-	bool success = false;
-	if (row[x] == row[x+1]) {
-		row[x] *= 2;
-		row[x+1] = 0;
-		success = true;
-	}
-	return success;
-}
-
-bool condenseRow(u_int16_t row[SIZE]) {
-	bool success = false;
-	int8_t x,length;
-	length = rowLength(row);
-	for (x=0;x<length-1;x++) {
-		length = rowLength(row);
-		success |= shiftRow(row,x,length);
-		length = rowLength(row);
-		success |= collapseRow(row,x);
-	}
-	return success;
 }
 
 int main(void) {
