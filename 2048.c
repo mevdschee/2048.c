@@ -17,11 +17,19 @@
 #include <time.h>
 
 #define SIZE 4
+const char *BLUE = "\033[0;34;%dm";
+const char *BRIGHTRED = "\033[0;31;%dm";
+const char *DARKRED = "\033[0;41;%dm";
+const char *GREEN = "\033[0;32;%dm";
+const char *CYAN = "\033[0;36;%dm";
+const char *PURPLE = "\033[0;35;%dm";
+const char *YELLOW = "\033[0;33;%dm";
+const char *background = "\033[0;41;%dm";
 
 void getColor(uint16_t value, char *color, size_t length) {
 	uint16_t c = 40;
 	if (value > 0) while (value >>= 1) c++;
-	snprintf(color,length,"\033[0;41;%dm",c);
+	snprintf(color,length,background,c);
 }
 
 void drawBoard(uint16_t board[SIZE][SIZE]) {
@@ -260,10 +268,21 @@ void setBufferedInput(bool enable) {
 int main(int argc, char *argv[]) {
 	uint16_t board[SIZE][SIZE];
 	char c;
-	bool success, background = true;
+	bool success;
 
-	if (argc==2 && !strncmp("-n", argv[1], 2)) {
-		background = false;
+	if (argc==2 && !strncmp("-", argv[1], 1)) {
+		if (!strcmp("-b", argv[1]))
+			background = BLUE;
+		if (!strcmp("-r", argv[1]))
+			background = BRIGHTRED;
+		if (!strcmp("-g", argv[1]))
+			background = GREEN;
+		if (!strcmp("-c", argv[1]))
+			background = CYAN;
+		if (!strcmp("-p", argv[1]))
+			background = PURPLE;
+		if (!strcmp("-y", argv[1]))
+			background = YELLOW;
 	}
 
 	memset(board,0,sizeof(board));

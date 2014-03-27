@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS = -O3 -g3 -std=c99 -Wall -pedantic
+CFLAGS = -O3 -std=c99
 
 .PHONY: all
 
