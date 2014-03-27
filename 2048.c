@@ -64,7 +64,7 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 		}
 		printf("|\n");
 	}
-	printf("\nPress ararray keys or 'q' to quit\n\n");
+	printf("\nPress arrow keys or 'q' to quit\n\n");
 }
 
 int8_t arrayLength(uint16_t array[SIZE]) {
