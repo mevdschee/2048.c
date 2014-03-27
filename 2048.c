@@ -17,7 +17,7 @@
 #include <time.h>
 #include <stdlib.h>
 
-const int8_t SIZE=4;
+#define SIZE 4
 
 void getColor(uint16_t value, char *color, size_t length) {
 	uint16_t c = 40;
