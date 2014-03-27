@@ -5,9 +5,13 @@
 
 Console version of the game "2048" for GNU/Linux
 
+### Gameplay
+
+You can move the tiles in four directions using the arrow keys: up, down, left, and right. All numbers on the board will slide into that direction until they hit the wall and if they bump into each other then two numbers will be combined into one if they have the same value. Each number will only be combined once per move. Every move a new number 2 or 4 appears. If the board is full you lose the game, but if you have a 2048 on the board you have won!
+
 ### Requirements
 
-- gcc
+- C compiler
 
 ### Installation
 
@@ -16,24 +20,3 @@ wget https://raw.githubusercontent.com/mevdschee/2048.c/master/2048.c
 gcc -o 2048 2048.c
 ./2048
 ```
-
-### Background Colors
-
-Blue: 
-`./2048 -b`
-
-Bright Red:
-`./2048 -r`
-
-Green:
-`./2048 -g`
-
-Cyan:
-`./2048 -c`
-
-Purple:
-`./2048 -p`
-
-Yellow:
-`./2048 -y`
-
