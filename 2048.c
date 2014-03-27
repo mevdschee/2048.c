@@ -6,24 +6,26 @@
  ============================================================================
  */
 
+#define _XOPEN_SOURCE 500
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <termios.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <time.h>
 #include <stdlib.h>
 
-const int8_t SIZE=4;
+#define SIZE 4
 
-void getColor(u_int16_t value, char *color, size_t length) {
-	u_int16_t c = 40;
+void getColor(uint16_t value, char *color, size_t length) {
+	uint16_t c = 40;
 	if (value > 0) while (value >>= 1) c++;
 	snprintf(color,length,"\033[0;41;%dm",c);
 }
 
-void drawBoard(u_int16_t board[SIZE][SIZE]) {
+void drawBoard(uint16_t board[SIZE][SIZE]) {
 	int8_t x,y;
 	char color[20], reset[] = "\033[0m";
 	printf("\033[2J");
@@ -62,10 +64,10 @@ void drawBoard(u_int16_t board[SIZE][SIZE]) {
 		}
 		printf("|\n");
 	}
-	printf("\nPress ararray keys or 'q' to quit\n\n");
+	printf("\nPress arrow keys or 'q' to quit\n\n");
 }
 
-int8_t arrayLength(u_int16_t array[SIZE]) {
+int8_t arrayLength(uint16_t array[SIZE]) {
 	int8_t len;
 	len = SIZE;
 	while (len>0 && array[len-1]==0) {
@@ -74,7 +76,7 @@ int8_t arrayLength(u_int16_t array[SIZE]) {
 	return len;
 }
 
-bool shiftArray(u_int16_t array[SIZE],int8_t start,int8_t length) {
+bool shiftArray(uint16_t array[SIZE],int8_t start,int8_t length) {
 	bool success = false;
 	int8_t x,i;
 	for (x=start;x<length-1;x++) {
@@ -90,7 +92,7 @@ bool shiftArray(u_int16_t array[SIZE],int8_t start,int8_t length) {
 	return success;
 }
 
-bool collapseArray(u_int16_t array[SIZE],int8_t x) {
+bool collapseArray(uint16_t array[SIZE],int8_t x) {
 	bool success = false;
 	if (array[x] == array[x+1]) {
 		array[x] *= 2;
@@ -100,7 +102,7 @@ bool collapseArray(u_int16_t array[SIZE],int8_t x) {
 	return success;
 }
 
-bool condenseArray(u_int16_t array[SIZE]) {
+bool condenseArray(uint16_t array[SIZE]) {
 	bool success = false;
 	int8_t x,length;
 	length = arrayLength(array);
@@ -113,9 +115,9 @@ bool condenseArray(u_int16_t array[SIZE]) {
 	return success;
 }
 
-void rotateBoard(u_int16_t board[SIZE][SIZE]) {
+void rotateBoard(uint16_t board[SIZE][SIZE]) {
 	int8_t i,j,n=SIZE;
-	u_int16_t tmp;
+	uint16_t tmp;
 	for (i=0; i<n/2; i++){
 		for (j=i; j<n-i-1; j++){
 			tmp = board[i][j];
@@ -127,7 +129,7 @@ void rotateBoard(u_int16_t board[SIZE][SIZE]) {
 	}
 }
 
-bool moveUp(u_int16_t board[SIZE][SIZE]) {
+bool moveUp(uint16_t board[SIZE][SIZE]) {
 	bool success = false;
 	int8_t x;
 	for (x=0;x<SIZE;x++) {
@@ -136,7 +138,7 @@ bool moveUp(u_int16_t board[SIZE][SIZE]) {
 	return success;
 }
 
-bool moveLeft(u_int16_t board[SIZE][SIZE]) {
+bool moveLeft(uint16_t board[SIZE][SIZE]) {
 	bool success;
 	rotateBoard(board);
 	success = moveUp(board);
@@ -146,7 +148,7 @@ bool moveLeft(u_int16_t board[SIZE][SIZE]) {
 	return success;
 }
 
-bool moveDown(u_int16_t board[SIZE][SIZE]) {
+bool moveDown(uint16_t board[SIZE][SIZE]) {
 	bool success;
 	rotateBoard(board);
 	rotateBoard(board);
@@ -156,7 +158,7 @@ bool moveDown(u_int16_t board[SIZE][SIZE]) {
 	return success;
 }
 
-bool moveRight(u_int16_t board[SIZE][SIZE]) {
+bool moveRight(uint16_t board[SIZE][SIZE]) {
 	bool success;
 	rotateBoard(board);
 	rotateBoard(board);
@@ -166,7 +168,7 @@ bool moveRight(u_int16_t board[SIZE][SIZE]) {
 	return success;
 }
 
-bool findPairDown(u_int16_t board[SIZE][SIZE]) {
+bool findPairDown(uint16_t board[SIZE][SIZE]) {
 	bool success = false;
 	int8_t x,y;
 	for (x=0;x<SIZE;x++) {
@@ -177,7 +179,7 @@ bool findPairDown(u_int16_t board[SIZE][SIZE]) {
 	return success;
 }
 
-int16_t countEmpty(u_int16_t board[SIZE][SIZE]) {
+int16_t countEmpty(uint16_t board[SIZE][SIZE]) {
 	int8_t x,y;
 	int16_t count=0;
 	for (x=0;x<SIZE;x++) {
@@ -190,7 +192,7 @@ int16_t countEmpty(u_int16_t board[SIZE][SIZE]) {
 	return count;
 }
 
-bool gameEnded(u_int16_t board[SIZE][SIZE]) {
+bool gameEnded(uint16_t board[SIZE][SIZE]) {
 	bool ended = true;
 	if (countEmpty(board)>0) return false;
     if (findPairDown(board)) return false;
@@ -202,11 +204,11 @@ bool gameEnded(u_int16_t board[SIZE][SIZE]) {
     return ended;
 }
 
-void addRandom(u_int16_t board[SIZE][SIZE]) {
+void addRandom(uint16_t board[SIZE][SIZE]) {
 	static bool initialized = false;
 	int8_t x,y;
 	int16_t r,len=0;
-	u_int16_t n,list[SIZE*SIZE][2];
+	uint16_t n,list[SIZE*SIZE][2];
 
 	if (!initialized) {
 		srand(time(NULL));
@@ -257,7 +259,7 @@ void setBufferedInput(bool enable) {
 }
 
 int main(void) {
-	u_int16_t board[SIZE][SIZE];
+	uint16_t board[SIZE][SIZE];
 	char c;
 	bool success;
 
