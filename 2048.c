@@ -17,19 +17,11 @@
 #include <time.h>
 
 #define SIZE 4
-const char *BLUE = "\033[0;34;%dm";
-const char *BRIGHTRED = "\033[0;31;%dm";
-const char *DARKRED = "\033[0;41;%dm";
-const char *GREEN = "\033[0;32;%dm";
-const char *CYAN = "\033[0;36;%dm";
-const char *PURPLE = "\033[0;35;%dm";
-const char *YELLOW = "\033[0;33;%dm";
-const char *background = "\033[0;41;%dm";
 
 void getColor(uint16_t value, char *color, size_t length) {
 	uint16_t c = 40;
 	if (value > 0) while (value >>= 1) c++;
-	snprintf(color,length,background,c);
+	snprintf(color,length,"\033[0;41;%dm",c);
 }
 
 void drawBoard(uint16_t board[SIZE][SIZE]) {
@@ -87,7 +79,7 @@ bool shiftArray(uint16_t array[SIZE],int8_t start,int8_t length) {
 	bool success = false;
 	int8_t x,i;
 	for (x=start;x<length-1;x++) {
-    	while (array[x]==0) {
+		while (array[x]==0) {
 			for (i=x;i<length-1;i++) {
 				array[i] = array[i+1];
 				array[i+1] = 0;
@@ -202,13 +194,13 @@ int16_t countEmpty(uint16_t board[SIZE][SIZE]) {
 bool gameEnded(uint16_t board[SIZE][SIZE]) {
 	bool ended = true;
 	if (countEmpty(board)>0) return false;
-    if (findPairDown(board)) return false;
+	if (findPairDown(board)) return false;
 	rotateBoard(board);
-    if (findPairDown(board)) ended = false;
-    rotateBoard(board);
-    rotateBoard(board);
-    rotateBoard(board);
-    return ended;
+	if (findPairDown(board)) ended = false;
+	rotateBoard(board);
+	rotateBoard(board);
+	rotateBoard(board);
+	return ended;
 }
 
 void addRandom(uint16_t board[SIZE][SIZE]) {
@@ -270,21 +262,6 @@ int main(int argc, char *argv[]) {
 	char c;
 	bool success;
 
-	if (argc==2 && !strncmp("-", argv[1], 1)) {
-		if (!strcmp("-b", argv[1]))
-			background = BLUE;
-		if (!strcmp("-r", argv[1]))
-			background = BRIGHTRED;
-		if (!strcmp("-g", argv[1]))
-			background = GREEN;
-		if (!strcmp("-c", argv[1]))
-			background = CYAN;
-		if (!strcmp("-p", argv[1]))
-			background = PURPLE;
-		if (!strcmp("-y", argv[1]))
-			background = YELLOW;
-	}
-
 	memset(board,0,sizeof(board));
 	addRandom(board);
 	addRandom(board);
@@ -293,19 +270,14 @@ int main(int argc, char *argv[]) {
 	setBufferedInput(false);
 	do {
 		c=getchar();
-		// printf("%d\n", c);  // Test for different key inputs
 		switch(c) {
-			case 97:	// a key
-			case 68: 	// left arrow
+			case 68:	// left arrow
 				success = moveLeft(board);  break; 
-			case 100: 	// d key
-			case 67: 	// right arrow
+			case 67:	// right arrow
 				success = moveRight(board); break; 
-			case 119: 	// w key
-			case 65: 	// up arrow
+			case 65:	// up arrow
 				success = moveUp(board);    break; 
-			case 115: 	// s key
-			case 66: 	// down arrow
+			case 66:	// down arrow
 				success = moveDown(board);  break; 
 			default: success = false;
 		}
@@ -316,7 +288,7 @@ int main(int argc, char *argv[]) {
 			drawBoard(board);
 			if (gameEnded(board)) break;
 		}
-	} while (c!='n');
+	} while (c!='q');
 	setBufferedInput(true);
 
 	printf("GAME OVER\n");
