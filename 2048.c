@@ -15,7 +15,6 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <time.h>
-#include <stdlib.h>
 
 #define SIZE 4
 
@@ -64,7 +63,7 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 		}
 		printf("|\n");
 	}
-	printf("\nPress arrow keys or 'q' to quit\n\n");
+	printf("\nPress arrow keys or wasd to move. 'n' to quit\n\n");
 }
 
 int8_t arrayLength(uint16_t array[SIZE]) {
@@ -258,10 +257,14 @@ void setBufferedInput(bool enable) {
 	}
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
 	uint16_t board[SIZE][SIZE];
 	char c;
-	bool success;
+	bool success, background = true;
+
+	if (argc==2 && !strncmp("-n", argv[1], 2)) {
+		background = false;
+	}
 
 	memset(board,0,sizeof(board));
 	addRandom(board);
@@ -271,11 +274,20 @@ int main(void) {
 	setBufferedInput(false);
 	do {
 		c=getchar();
+		// printf("%d\n", c);  // Test for different key inputs
 		switch(c) {
-			case 68: success = moveLeft(board);  break;
-			case 67: success = moveRight(board); break;
-			case 65: success = moveUp(board);    break;
-			case 66: success = moveDown(board);  break;
+			case 97:	// a key
+			case 68: 	// left arrow
+				success = moveLeft(board);  break; 
+			case 100: 	// d key
+			case 67: 	// right arrow
+				success = moveRight(board); break; 
+			case 119: 	// w key
+			case 65: 	// up arrow
+				success = moveUp(board);    break; 
+			case 115: 	// s key
+			case 66: 	// down arrow
+				success = moveDown(board);  break; 
 			default: success = false;
 		}
 		if (success) {
@@ -285,7 +297,7 @@ int main(void) {
 			drawBoard(board);
 			if (gameEnded(board)) break;
 		}
-	} while (c!='q');
+	} while (c!='n');
 	setBufferedInput(true);
 
 	printf("GAME OVER\n");
