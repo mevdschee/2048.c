@@ -15,14 +15,21 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <time.h>
-#include <stdlib.h>
 
 #define SIZE 4
+const char *BLUE = "\033[0;34;%dm";
+const char *BRIGHTRED = "\033[0;31;%dm";
+const char *DARKRED = "\033[0;41;%dm";
+const char *GREEN = "\033[0;32;%dm";
+const char *CYAN = "\033[0;36;%dm";
+const char *PURPLE = "\033[0;35;%dm";
+const char *YELLOW = "\033[0;33;%dm";
+const char *background = "\033[0;41;%dm";
 
 void getColor(uint16_t value, char *color, size_t length) {
 	uint16_t c = 40;
 	if (value > 0) while (value >>= 1) c++;
-	snprintf(color,length,"\033[0;41;%dm",c);
+	snprintf(color,length,background,c);
 }
 
 void drawBoard(uint16_t board[SIZE][SIZE]) {
@@ -64,7 +71,7 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 		}
 		printf("|\n");
 	}
-	printf("\nPress arrow keys or 'q' to quit\n\n");
+	printf("\nPress arrow keys or wasd to move. 'n' to quit\n\n");
 }
 
 int8_t arrayLength(uint16_t array[SIZE]) {
@@ -258,10 +265,25 @@ void setBufferedInput(bool enable) {
 	}
 }
 
-int main(void) {
+int main(int argc, char *argv[]) {
 	uint16_t board[SIZE][SIZE];
 	char c;
 	bool success;
+
+	if (argc==2 && !strncmp("-", argv[1], 1)) {
+		if (!strcmp("-b", argv[1]))
+			background = BLUE;
+		if (!strcmp("-r", argv[1]))
+			background = BRIGHTRED;
+		if (!strcmp("-g", argv[1]))
+			background = GREEN;
+		if (!strcmp("-c", argv[1]))
+			background = CYAN;
+		if (!strcmp("-p", argv[1]))
+			background = PURPLE;
+		if (!strcmp("-y", argv[1]))
+			background = YELLOW;
+	}
 
 	memset(board,0,sizeof(board));
 	addRandom(board);
@@ -271,11 +293,20 @@ int main(void) {
 	setBufferedInput(false);
 	do {
 		c=getchar();
+		// printf("%d\n", c);  // Test for different key inputs
 		switch(c) {
-			case 68: success = moveLeft(board);  break;
-			case 67: success = moveRight(board); break;
-			case 65: success = moveUp(board);    break;
-			case 66: success = moveDown(board);  break;
+			case 97:	// a key
+			case 68: 	// left arrow
+				success = moveLeft(board);  break; 
+			case 100: 	// d key
+			case 67: 	// right arrow
+				success = moveRight(board); break; 
+			case 119: 	// w key
+			case 65: 	// up arrow
+				success = moveUp(board);    break; 
+			case 115: 	// s key
+			case 66: 	// down arrow
+				success = moveDown(board);  break; 
 			default: success = false;
 		}
 		if (success) {
@@ -285,7 +316,7 @@ int main(void) {
 			drawBoard(board);
 			if (gameEnded(board)) break;
 		}
-	} while (c!='q');
+	} while (c!='n');
 	setBufferedInput(true);
 
 	printf("GAME OVER\n");
