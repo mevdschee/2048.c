@@ -253,7 +253,7 @@ void setBufferedInput(bool enable) {
 }
 
 int test() {
-	uint16_t array[4];
+	uint16_t array[SIZE];
 	uint16_t data[] = {
 		0,0,0,2,	2,0,0,0,
 		0,0,2,2,	4,0,0,0,
@@ -261,7 +261,7 @@ int test() {
 		2,0,0,2,	4,0,0,0,
 		2,0,2,0,	4,0,0,0,
 		2,2,2,0,	4,2,0,0,
-		2,0,2,2,	4,2,0,0,
+		2,0,2,2,	4,2,2,0,
 		2,2,0,2,	4,2,0,0,
 		2,2,2,2,	4,4,0,0,
 		4,4,2,2,	8,4,0,0,
@@ -270,7 +270,7 @@ int test() {
 		4,0,2,2,	4,4,0,0
 	};
 	uint16_t *in,*out;
-	uint8_t i,t;
+	uint8_t i,t,tests;
 	bool success = true;
 
 	for (t=0;t<(sizeof(data)/sizeof(data[0]))/(2*SIZE);t++) {
@@ -286,8 +286,22 @@ int test() {
 			}
 		}
 		if (success==false) {
-			printf("(%d,%d,%d,%d)=>",in[0],in[1],in[2],in[3]);
-			printf("(%d,%d,%d,%d)\n",array[0],array[1],array[2],array[3]);
+			for (i=0;i<SIZE;i++) {
+				printf("%d ",in[i]);
+			}
+			printf("=> ");
+			for (i=0;i<SIZE;i++) {
+				printf("%d ",array[i]);
+			}
+			printf("expected ");
+			for (i=0;i<SIZE;i++) {
+				printf("%d ",in[i]);
+			}
+			printf("=> ");
+			for (i=0;i<SIZE;i++) {
+				printf("%d ",out[i]);
+			}
+			printf("\n");
 			break;
 		}
 	}
