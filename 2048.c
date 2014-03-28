@@ -99,7 +99,8 @@ bool slideArray(uint16_t array[SIZE]) {
 			t = findTarget(array,x,stop);
 			// if target is not original position, then move or merge
 			if (t!=x) {
-				if (array[t]) stop = t+1;
+				// if target is not zero, set stop to avoid double merge
+				if (array[t]!=0) stop = t+1;
 				array[t]+=array[x];
 				array[x]=0;
 				success = true;
