@@ -66,50 +66,48 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 	printf("\nPress arrow keys or 'q' to quit\n\n");
 }
 
-int8_t arrayLength(uint16_t array[SIZE]) {
-	int8_t len;
-	len = SIZE;
-	while (len>0 && array[len-1]==0) {
-		len--;
-	}
-	return len;
-}
-
-bool shiftArray(uint16_t array[SIZE],int8_t start,int8_t length) {
-	bool success = false;
-	int8_t x,i;
-	for (x=start;x<length-1;x++) {
-		while (array[x]==0) {
-			for (i=x;i<length-1;i++) {
-				array[i] = array[i+1];
-				array[i+1] = 0;
-				length = arrayLength(array);
-				success = true;
+int8_t findTarget(uint16_t array[SIZE],int8_t x) {
+	int8_t t;
+	// if the position is already on the first, dont evaluate
+	if (x==0) return x;
+	for(t=x-1;t>=0;t--) {
+		if (array[t]!=0) {
+			if (array[t]!=array[x]) {
+				// merge is not possible, take next position
+				return t+1;
+			}
+			return t;
+		} else {
+			// we cannot slide further, return this one
+			if (t==0) {
+				return t;
 			}
 		}
 	}
-	return success;
+	// we did not find a
+	return x;
 }
 
-bool collapseArray(uint16_t array[SIZE],int8_t x) {
+bool slideNumber(uint16_t array[SIZE],int8_t x) {
 	bool success = false;
-	if (array[x] == array[x+1]) {
-		array[x] *= 2;
-		array[x+1] = 0;
-		success = true;
+	int8_t t;
+	t = findTarget(array,x);
+	// if target is not original position, then move or merge
+	if (t!=x) {
+	  array[t]+=array[x];
+	  array[x]=0;
+	  success = true;
 	}
 	return success;
 }
 
-bool condenseArray(uint16_t array[SIZE]) {
+bool slideArray(uint16_t array[SIZE]) {
 	bool success = false;
-	int8_t x,length;
-	length = arrayLength(array);
-	for (x=0;x<length-1;x++) {
-		length = arrayLength(array);
-		success |= shiftArray(array,x,length);
-		length = arrayLength(array);
-		success |= collapseArray(array,x);
+	int8_t x;
+	for (x=0;x<SIZE;x++) {
+		if (array[x]!=0) {
+			success |= slideNumber(array,x);
+		}
 	}
 	return success;
 }
@@ -132,7 +130,7 @@ bool moveUp(uint16_t board[SIZE][SIZE]) {
 	bool success = false;
 	int8_t x;
 	for (x=0;x<SIZE;x++) {
-		success |= condenseArray(board[x]);
+		success |= slideArray(board[x]);
 	}
 	return success;
 }
@@ -228,7 +226,7 @@ void addRandom(uint16_t board[SIZE][SIZE]) {
 		r = rand()%len;
 		x = list[r][0];
 		y = list[r][1];
-		n = ((rand()%10)/9+1)*2;
+		n = (rand()%2+1)*2;
 		board[x][y]=n;
 	}
 }
