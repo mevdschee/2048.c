@@ -66,9 +66,9 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 	printf("\nPress arrow keys or 'q' to quit\n\n");
 }
 
-int8_t findTarget(uint16_t array[SIZE],int8_t x,int8_t s) {
+int8_t findTarget(uint16_t array[SIZE],int8_t x,int8_t stop) {
 	int8_t t;
-	// if the position is already on the first, dont evaluate
+	// if the position is already on the first, don't evaluate
 	if (x==0) {
 		return x;
 	}
@@ -80,8 +80,8 @@ int8_t findTarget(uint16_t array[SIZE],int8_t x,int8_t s) {
 			}
 			return t;
 		} else {
-			// we cannot slide further, return this one
-			if (t==0 || t==s) {
+			// we should not slide further, return this one
+			if (t==stop) {
 				return t;
 			}
 		}
@@ -92,14 +92,14 @@ int8_t findTarget(uint16_t array[SIZE],int8_t x,int8_t s) {
 
 bool slideArray(uint16_t array[SIZE]) {
 	bool success = false;
-	int8_t x,t,s;
-	s=0;
+	int8_t x,t,stop=0;
+
 	for (x=0;x<SIZE;x++) {
 		if (array[x]!=0) {
-			t = findTarget(array,x,s);
+			t = findTarget(array,x,stop);
 			// if target is not original position, then move or merge
 			if (t!=x) {
-				if (array[t]) s = t+1;
+				if (array[t]) stop = t+1;
 				array[t]+=array[x];
 				array[x]=0;
 				success = true;
