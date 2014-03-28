@@ -21,3 +21,19 @@ wget https://raw.githubusercontent.com/mevdschee/2048.c/master/2048.c
 gcc -o 2048 2048.c
 ./2048
 ```
+
+### Contributing
+
+Contributions are very welcome. Things you could implement:
+
+- Scoring
+- Make it prettier using 256 color and box drawing, see:
+  - http://misc.flogisoft.com/bash/tip_colors_and_formatting
+  - http://en.wikipedia.org/wiki/Box-drawing_character
+
+Always run the tests before committing using:
+
+```
+$ ./2048 test
+All 13 tests executed successfully
+```
