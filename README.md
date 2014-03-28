@@ -22,7 +22,7 @@ gcc -o 2048 2048.c
 ./2048
 ```
 
-### Development
+### Contributing
 
 Contributions are very welcome. Things you could implement:
 
