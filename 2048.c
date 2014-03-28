@@ -228,7 +228,7 @@ void addRandom(uint16_t board[SIZE][SIZE]) {
 		r = rand()%len;
 		x = list[r][0];
 		y = list[r][1];
-		n = (rand()%2+1)*2;
+		n = ((rand()%10)/9+1)*2;
 		board[x][y]=n;
 	}
 }
