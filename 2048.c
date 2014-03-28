@@ -66,10 +66,12 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 	printf("\nPress arrow keys or 'q' to quit\n\n");
 }
 
-int8_t findTarget(uint16_t array[SIZE],int8_t x) {
+int8_t findTarget(uint16_t array[SIZE],int8_t x,int8_t s) {
 	int8_t t;
 	// if the position is already on the first, dont evaluate
-	if (x==0) return x;
+	if (x==0) {
+		return x;
+	}
 	for(t=x-1;t>=0;t--) {
 		if (array[t]!=0) {
 			if (array[t]!=array[x]) {
@@ -79,7 +81,7 @@ int8_t findTarget(uint16_t array[SIZE],int8_t x) {
 			return t;
 		} else {
 			// we cannot slide further, return this one
-			if (t==0) {
+			if (t==0 || t==s) {
 				return t;
 			}
 		}
@@ -88,25 +90,20 @@ int8_t findTarget(uint16_t array[SIZE],int8_t x) {
 	return x;
 }
 
-bool slideNumber(uint16_t array[SIZE],int8_t x) {
-	bool success = false;
-	int8_t t;
-	t = findTarget(array,x);
-	// if target is not original position, then move or merge
-	if (t!=x) {
-	  array[t]+=array[x];
-	  array[x]=0;
-	  success = true;
-	}
-	return success;
-}
-
 bool slideArray(uint16_t array[SIZE]) {
 	bool success = false;
-	int8_t x;
+	int8_t x,t,s;
+	s=0;
 	for (x=0;x<SIZE;x++) {
 		if (array[x]!=0) {
-			success |= slideNumber(array,x);
+			t = findTarget(array,x,s);
+			// if target is not original position, then move or merge
+			if (t!=x) {
+				if (array[t]) s = t+1;
+				array[t]+=array[x];
+				array[x]=0;
+				success = true;
+			}
 		}
 	}
 	return success;
@@ -255,10 +252,56 @@ void setBufferedInput(bool enable) {
 	}
 }
 
+int test() {
+	uint16_t array[4];
+	uint16_t data[] = {
+		0,0,0,2,	2,0,0,0,
+		0,0,2,2,	4,0,0,0,
+		0,2,0,2,	4,0,0,0,
+		2,0,0,2,	4,0,0,0,
+		2,0,2,0,	4,0,0,0,
+		2,2,2,0,	4,2,0,0,
+		2,0,2,2,	4,2,0,0,
+		2,2,0,2,	4,2,0,0,
+		2,2,2,2,	4,4,0,0,
+		4,4,2,2,	8,4,0,0,
+		2,2,4,4,	4,8,0,0,
+		8,0,2,2,	8,4,0,0,
+		4,0,2,2,	4,4,0,0
+	};
+	uint16_t *in,*out;
+	uint8_t i,t;
+	bool success = true;
+
+	for (t=0;t<(sizeof(data)/sizeof(data[0]))/(2*SIZE);t++) {
+		in = data+t*2*SIZE;
+		out = in + SIZE;
+		for (i=0;i<SIZE;i++) {
+			array[i] = in[i];
+		}
+		slideArray(array);
+		for (i=0;i<SIZE;i++) {
+			if (array[i] != out[i]) {
+				success = false;
+			}
+		}
+		if (success==false) {
+			printf("(%d,%d,%d,%d)=>",in[0],in[1],in[2],in[3]);
+			printf("(%d,%d,%d,%d)\n",array[0],array[1],array[2],array[3]);
+			break;
+		}
+	}
+	return !success;
+}
+
 int main(int argc, char *argv[]) {
 	uint16_t board[SIZE][SIZE];
 	char c;
 	bool success;
+
+	if (argc == 2 && strcmp(argv[1],"test")==0) {
+		return test();
+	}
 
 	memset(board,0,sizeof(board));
 	addRandom(board);
