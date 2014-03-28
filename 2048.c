@@ -269,11 +269,12 @@ int test() {
 		8,0,2,2,	8,4,0,0,
 		4,0,2,2,	4,4,0,0
 	};
-	uint16_t *in,*out;
-	uint8_t i,t,tests;
+	uint16_t *in,*out,tests;
+	uint8_t i,t;
 	bool success = true;
 
-	for (t=0;t<(sizeof(data)/sizeof(data[0]))/(2*SIZE);t++) {
+	tests = (sizeof(data)/sizeof(data[0]))/(2*SIZE);
+	for (t=0;t<tests;t++) {
 		in = data+t*2*SIZE;
 		out = in + SIZE;
 		for (i=0;i<SIZE;i++) {
@@ -304,6 +305,9 @@ int test() {
 			printf("\n");
 			break;
 		}
+	}
+	if (success) {
+		printf("All %u tests executed successfully\n",tests);
 	}
 	return !success;
 }
