@@ -26,10 +26,10 @@ gcc -o 2048 2048.c
 
 Contributions are very welcome. Things you could implement:
 
-- Scoring
 - Make it prettier using 256 color and box drawing, see:
   - http://misc.flogisoft.com/bash/tip_colors_and_formatting
   - http://en.wikipedia.org/wiki/Box-drawing_character
+  - http://www.iam.uni-bonn.de/~alt/html/unicode_172.html
 
 Always run the tests before committing using:
 
