@@ -17,6 +17,7 @@
 #include <time.h>
 
 #define SIZE 4
+uint32_t score=0;
 
 void getColor(uint16_t value, char *color, size_t length) {
 	uint16_t c = 40;
@@ -28,6 +29,8 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 	int8_t x,y;
 	char color[20], reset[] = "\033[0m";
 	printf("\033[2J");
+
+	printf("score: %d\n",score);
 
 	for (x=0;x<SIZE;x++) {
 		printf(" ______");
@@ -100,7 +103,10 @@ bool slideArray(uint16_t array[SIZE]) {
 			// if target is not original position, then move or merge
 			if (t!=x) {
 				// if target is not zero, set stop to avoid double merge
-				if (array[t]!=0) stop = t+1;
+				if (array[t]!=0) {
+					score+=array[t]+array[x];
+					stop = t+1;
+				}
 				array[t]+=array[x];
 				array[x]=0;
 				success = true;
@@ -327,7 +333,6 @@ int main(int argc, char *argv[]) {
 	addRandom(board);
 	addRandom(board);
 	drawBoard(board);
-
 	setBufferedInput(false);
 	do {
 		c=getchar();
