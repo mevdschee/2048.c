@@ -15,58 +15,67 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <time.h>
+#include <signal.h>
 
 #define SIZE 4
 uint32_t score=0;
 
 void getColor(uint16_t value, char *color, size_t length) {
-	uint16_t c = 40;
-	if (value > 0) while (value >>= 1) c++;
-	snprintf(color,length,"\033[0;41;%dm",c);
+	uint8_t original[] = {8,15,1,15,2,15,3,15,4,15,5,15,6,15,7,15,9,0,10,0,11,0,12,0,13,0,14,0,15,0,15,0};
+	uint8_t blackwhite[] = {234,15,235,15,236,15,237,15,238,15,239,15,240,15,241,15,242,15,243,15,244,15,245,0,246,0,247,0,248,0,249,0};
+	uint8_t bluered[] = {235,15,63,15,57,15,93,15,129,15,165,15,201,15,200,15,199,15,198,15,197,15,196,15,196,15,196,15,196,15,196,15};
+	uint8_t *scheme = original;
+	uint8_t *b = scheme+0;
+	uint8_t *f = scheme+1;
+	if (value > 0) while (value >>= 1) {
+		if (b+2<scheme+16*2) {
+			b+=2;
+			f+=2;
+		}
+	}
+	snprintf(color,length,"\033[38;5;%d;48;5;%dm",*f,*b);
 }
 
 void drawBoard(uint16_t board[SIZE][SIZE]) {
 	int8_t x,y;
-	char color[20], reset[] = "\033[0m";
-	printf("\033[2J");
+	char color[40], reset[] = "\033[m";
+	printf("\033[?25l\033[2J\033[H");
 
-	printf("score: %d\n",score);
+	printf("2048.c %17d pts\n\n",score);
 
-	for (x=0;x<SIZE;x++) {
-		printf(" ______");
-	}
-	printf(" \n");
 	for (y=0;y<SIZE;y++) {
 		for (x=0;x<SIZE;x++) {
-			getColor(board[x][y],color,20);
+			getColor(board[x][y],color,40);
 			printf("%s",color);
-			printf("|      ");
+			printf("       ");
 			printf("%s",reset);
 		}
-		printf("|\n");
+		printf("\n");
 		for (x=0;x<SIZE;x++) {
-			getColor(board[x][y],color,20);
+			getColor(board[x][y],color,40);
 			printf("%s",color);
 			if (board[x][y]!=0) {
-				char s[7];
-				snprintf(s,7,"%u",board[x][y]);
-				int8_t t = 6-strlen(s);
-				printf("|%*s%s%*s",t-t/2,"",s,t/2,"");
+				char s[8];
+				snprintf(s,8,"%u",board[x][y]);
+				int8_t t = 7-strlen(s);
+				printf("%*s%s%*s",t-t/2,"",s,t/2,"");
 			} else {
-				printf("|      ");
+				printf("       ");
 			}
 			printf("%s",reset);
 		}
-		printf("|\n");
+		printf("\n");
 		for (x=0;x<SIZE;x++) {
-			getColor(board[x][y],color,20);
+			getColor(board[x][y],color,40);
 			printf("%s",color);
-			printf("|______");
+			printf("       ");
 			printf("%s",reset);
 		}
-		printf("|\n");
+		printf("\n");
 	}
-	printf("\nPress arrow keys or 'q' to quit\n\n");
+	printf("\n");
+	printf("        ←,↑,→,↓ or q        \n");
+	printf("\033[A");
 }
 
 int8_t findTarget(uint16_t array[SIZE],int8_t x,int8_t stop) {
@@ -320,6 +329,13 @@ int test() {
 	return !success;
 }
 
+void signal_callback_handler(int signum) {
+	printf("         TERMINATED         \n");
+	setBufferedInput(true);
+	printf("\033[?25h");
+	exit(signum);
+}
+
 int main(int argc, char *argv[]) {
 	uint16_t board[SIZE][SIZE];
 	char c;
@@ -329,12 +345,15 @@ int main(int argc, char *argv[]) {
 		return test();
 	}
 
+	// register signal handler for when ctrl-c is pressed
+	signal(SIGINT, signal_callback_handler);
+
 	memset(board,0,sizeof(board));
 	addRandom(board);
 	addRandom(board);
 	drawBoard(board);
 	setBufferedInput(false);
-	do {
+	while (true) {
 		c=getchar();
 		switch(c) {
 			case 68:	// left arrow
@@ -352,12 +371,19 @@ int main(int argc, char *argv[]) {
 			usleep(150000);
 			addRandom(board);
 			drawBoard(board);
-			if (gameEnded(board)) break;
+			if (gameEnded(board)) {
+				printf("         GAME OVER          \n");
+				break;
+			}
 		}
-	} while (c!='q');
+		if (c=='q') {
+			printf("            QUIT            \n");
+			break;
+		}
+	}
 	setBufferedInput(true);
 
-	printf("GAME OVER\n");
+	printf("\033[?25h");
 
 	return EXIT_SUCCESS;
 }
