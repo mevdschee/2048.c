@@ -25,15 +25,15 @@ void getColor(uint16_t value, char *color, size_t length) {
 	uint8_t blackwhite[] = {234,15,235,15,236,15,237,15,238,15,239,15,240,15,241,15,242,15,243,15,244,15,245,0,246,0,247,0,248,0,249,0};
 	uint8_t bluered[] = {235,15,63,15,57,15,93,15,129,15,165,15,201,15,200,15,199,15,198,15,197,15,196,15,196,15,196,15,196,15,196,15};
 	uint8_t *scheme = original;
-	uint8_t *b = scheme+0;
-	uint8_t *f = scheme+1;
+	uint8_t *background = scheme+0;
+	uint8_t *foreground = scheme+1;
 	if (value > 0) while (value >>= 1) {
-		if (b+2<scheme+16*2) {
-			b+=2;
-			f+=2;
+		if (background+2<scheme+sizeof(original)) {
+			background+=2;
+			foreground+=2;
 		}
 	}
-	snprintf(color,length,"\033[38;5;%d;48;5;%dm",*f,*b);
+	snprintf(color,length,"\033[38;5;%d;48;5;%dm",*foreground,*background);
 }
 
 void drawBoard(uint16_t board[SIZE][SIZE]) {
