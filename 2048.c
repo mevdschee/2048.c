@@ -39,7 +39,7 @@ void getColor(uint16_t value, char *color, size_t length) {
 void drawBoard(uint16_t board[SIZE][SIZE]) {
 	int8_t x,y;
 	char color[40], reset[] = "\033[m";
-	printf("\033[?25l\033[2J\033[H");
+	printf("\033[H");
 
 	printf("2048.c %17d pts\n\n",score);
 
@@ -344,6 +344,8 @@ int main(int argc, char *argv[]) {
 	if (argc == 2 && strcmp(argv[1],"test")==0) {
 		return test();
 	}
+
+	printf("\033[?25l\033[2J\033[H");
 
 	// register signal handler for when ctrl-c is pressed
 	signal(SIGINT, signal_callback_handler);
