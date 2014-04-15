@@ -74,7 +74,7 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 		printf("\n");
 	}
 	printf("\n");
-	printf("        ←,↑,→,↓ or q        \n");
+	printf(" a, w, s, d or ←,↑,→,↓ or q  \n");
 	printf("\033[A");
 }
 
@@ -358,14 +358,18 @@ int main(int argc, char *argv[]) {
 	while (true) {
 		c=getchar();
 		switch(c) {
+                        case 97:
 			case 68:	// left arrow
-				success = moveLeft(board);  break; 
+				success = moveLeft(board);  break;
+                        case 100:
 			case 67:	// right arrow
-				success = moveRight(board); break; 
+				success = moveRight(board); break;
+                        case 119:
 			case 65:	// up arrow
-				success = moveUp(board);    break; 
+				success = moveUp(board);    break;
+                        case 115:
 			case 66:	// down arrow
-				success = moveDown(board);  break; 
+				success = moveDown(board);  break;
 			default: success = false;
 		}
 		if (success) {
