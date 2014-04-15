@@ -358,16 +358,16 @@ int main(int argc, char *argv[]) {
 	while (true) {
 		c=getchar();
 		switch(c) {
-                        case 97:
+                        case 97:        // 'a' key
 			case 68:	// left arrow
 				success = moveLeft(board);  break;
-                        case 100:
+                        case 100:       // 'd' key
 			case 67:	// right arrow
 				success = moveRight(board); break;
-                        case 119:
+                        case 119:       // 'w' key
 			case 65:	// up arrow
 				success = moveUp(board);    break;
-                        case 115:
+                        case 115:       // 's' key
 			case 66:	// down arrow
 				success = moveDown(board);  break;
 			default: success = false;
