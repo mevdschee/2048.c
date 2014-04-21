@@ -74,7 +74,7 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 		printf("\n");
 	}
 	printf("\n");
-	printf("      ←,↑,→,↓, r, or q      \n");
+	printf("        ←,↑,→,↓ or q        \n");
 	printf("\033[A");
 }
 
