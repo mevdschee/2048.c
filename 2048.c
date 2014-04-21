@@ -383,7 +383,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		if (c=='q') {
-			printf("        QUIT? (Y/N)         \n");
+			printf("        QUIT? (y/n)         \n");
 			while (true) {
 			c=getchar();
 				if (c=='y'){
@@ -398,7 +398,7 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		if (c=='r') {
-			printf("       RESTART? (Y/N)       \n");
+			printf("       RESTART? (y/n)       \n");
 			while (true) {
 			c=getchar();
 				if (c=='y'){
