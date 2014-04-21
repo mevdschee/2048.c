@@ -22,8 +22,8 @@ uint32_t score=0;
 
 void getColor(uint16_t value, char *color, size_t length) {
 	uint8_t original[] = {8,255,1,255,2,255,3,255,4,255,5,255,6,255,7,255,9,0,10,0,11,0,12,0,13,0,14,0,255,0,255,0};
-	uint8_t blackwhite[] = {232,255,234,255,236,255,238,255,240,255,242,255,244,255,246,0,248,0,249,0,250,0,251,0,252,0,253,0,254,0,255,0};
-	uint8_t bluered[] = {235,255,63,255,57,255,93,255,129,255,165,255,201,255,200,255,199,255,198,255,197,255,196,255,196,255,196,255,196,255,196,255};
+	//uint8_t blackwhite[] = {232,255,234,255,236,255,238,255,240,255,242,255,244,255,246,0,248,0,249,0,250,0,251,0,252,0,253,0,254,0,255,0};
+	//uint8_t bluered[] = {235,255,63,255,57,255,93,255,129,255,165,255,201,255,200,255,199,255,198,255,197,255,196,255,196,255,196,255,196,255,196,255};
 	uint8_t *scheme = original;
 	uint8_t *background = scheme+0;
 	uint8_t *foreground = scheme+1;
@@ -358,16 +358,16 @@ int main(int argc, char *argv[]) {
 	while (true) {
 		c=getchar();
 		switch(c) {
-                        case 97:        // 'a' key
+			case 97:        // 'a' key
 			case 68:	// left arrow
 				success = moveLeft(board);  break;
-                        case 100:       // 'd' key
+			case 100:       // 'd' key
 			case 67:	// right arrow
 				success = moveRight(board); break;
-                        case 119:       // 'w' key
+			case 119:       // 'w' key
 			case 65:	// up arrow
 				success = moveUp(board);    break;
-                        case 115:       // 's' key
+			case 115:       // 's' key
 			case 66:	// down arrow
 				success = moveDown(board);  break;
 			default: success = false;
