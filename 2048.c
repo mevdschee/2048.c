@@ -74,7 +74,7 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 		printf("\n");
 	}
 	printf("\n");
-	printf("        ←,↑,→,↓ or q        \n");
+	printf("      ←,↑,→,↓, r, or q      \n");
 	printf("\033[A");
 }
 
@@ -383,8 +383,36 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		if (c=='q') {
-			printf("            QUIT            \n");
-			break;
+			printf("        QUIT? (Y/N)         \n");
+			while (true) {
+			c=getchar();
+				if (c=='y'){
+					setBufferedInput(true);
+					printf("\033[?25h");
+					exit(0);
+				}
+				else {
+					drawBoard(board);
+					break;
+				}
+			}
+		}
+		if (c=='r') {
+			printf("       RESTART? (Y/N)       \n");
+			while (true) {
+			c=getchar();
+				if (c=='y'){
+					memset(board,0,sizeof(board));
+					addRandom(board);
+					addRandom(board);
+					drawBoard(board);
+					break;
+				}
+				else {
+					drawBoard(board);
+					break;
+				}
+			}
 		}
 	}
 	setBufferedInput(true);
