@@ -1,6 +1,6 @@
 CFLAGS += -std=c99
 
-.PHONY: all
+.PHONY: all clean
 
 all: 2048
 
