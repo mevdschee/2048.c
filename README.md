@@ -22,6 +22,25 @@ gcc -o 2048 2048.c
 ./2048
 ```
 
+### Running
+
+The game supports different color schemes. For the original color scheme run:
+
+```
+./2048
+```
+For the black-to-white color scheme (requires 256 colors):
+
+```
+./2048 blackwhite
+```
+
+For the blue-to-red color scheme (requires 256 colors):
+
+```
+./2048 bluered
+```
+
 ### Contributing
 
 Contributions are very welcome. Always run the tests before committing using:
