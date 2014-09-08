@@ -19,16 +19,17 @@
 
 #define SIZE 4
 uint32_t score=0;
+uint8_t scheme=0;
 
 void getColor(uint16_t value, char *color, size_t length) {
 	uint8_t original[] = {8,255,1,255,2,255,3,255,4,255,5,255,6,255,7,255,9,0,10,0,11,0,12,0,13,0,14,0,255,0,255,0};
-	//uint8_t blackwhite[] = {232,255,234,255,236,255,238,255,240,255,242,255,244,255,246,0,248,0,249,0,250,0,251,0,252,0,253,0,254,0,255,0};
-	//uint8_t bluered[] = {235,255,63,255,57,255,93,255,129,255,165,255,201,255,200,255,199,255,198,255,197,255,196,255,196,255,196,255,196,255,196,255};
-	uint8_t *scheme = original;
-	uint8_t *background = scheme+0;
-	uint8_t *foreground = scheme+1;
+	uint8_t blackwhite[] = {232,255,234,255,236,255,238,255,240,255,242,255,244,255,246,0,248,0,249,0,250,0,251,0,252,0,253,0,254,0,255,0};
+	uint8_t bluered[] = {235,255,63,255,57,255,93,255,129,255,165,255,201,255,200,255,199,255,198,255,197,255,196,255,196,255,196,255,196,255,196,255};
+	uint8_t *schemes[] = {original,blackwhite,bluered};
+	uint8_t *background = schemes[scheme]+0;
+	uint8_t *foreground = schemes[scheme]+1;
 	if (value > 0) while (value >>= 1) {
-		if (background+2<scheme+sizeof(original)) {
+		if (background+2<schemes[scheme]+sizeof(original)) {
 			background+=2;
 			foreground+=2;
 		}
@@ -343,6 +344,12 @@ int main(int argc, char *argv[]) {
 
 	if (argc == 2 && strcmp(argv[1],"test")==0) {
 		return test();
+	}
+	if (argc == 2 && strcmp(argv[1],"blackwhite")==0) {
+		scheme = 1;
+	}
+	if (argc == 2 && strcmp(argv[1],"bluered")==0) {
+		scheme = 2;
 	}
 
 	printf("\033[?25l\033[2J\033[H");
