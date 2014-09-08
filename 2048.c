@@ -17,7 +17,8 @@
 #include <time.h>
 #include <signal.h>
 
-#define SIZE 4
+uint16_t SIZE = 4;
+
 uint32_t score=0;
 uint8_t scheme=0;
 
@@ -42,7 +43,7 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 	char color[40], reset[] = "\033[m";
 	printf("\033[H");
 
-	printf("2048.c %17d pts\n\n",score);
+	printf("2048.c (%dx%d) %11d pts\n\n",SIZE, SIZE, score);
 
 	for (y=0;y<SIZE;y++) {
 		for (x=0;x<SIZE;x++) {
@@ -352,16 +353,40 @@ int main(int argc, char *argv[]) {
 		scheme = 2;
 	}
 
-	printf("\033[?25l\033[2J\033[H");
-
 	// register signal handler for when ctrl-c is pressed
 	signal(SIGINT, signal_callback_handler);
+
+	setBufferedInput(false);
+
+
+	while(1)
+	{
+		printf("\033[?25l\033[2J\033[H");
+		printf("Please choose Board size [2-4]: ");
+		char buffer[3];
+		fgets(buffer, 2, stdin);
+
+		if(atoi(buffer) < 2 || atoi(buffer) > 4)
+		{
+					continue;
+		}
+		else
+		{
+					SIZE = atoi(buffer);
+					printf("\nHere we go!");
+					break;
+		}
+
+	}
+
+
+
+	printf("\033[?25l\033[2J\033[H");
 
 	memset(board,0,sizeof(board));
 	addRandom(board);
 	addRandom(board);
 	drawBoard(board);
-	setBufferedInput(false);
 	while (true) {
 		c=getchar();
 		switch(c) {
@@ -432,4 +457,3 @@ int main(int argc, char *argv[]) {
 
 	return EXIT_SUCCESS;
 }
-
