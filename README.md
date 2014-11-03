@@ -24,7 +24,7 @@ gcc -o 2048 2048.c
 
 ### Running
 
-The game supports different color schemes. This depends on ANSI support and xterm needs to be compiled with either 88 or 256 color mode. For the original color scheme run:
+The game supports different color schemes. This depends on ANSI support and xterm needs to be compiled with 88 or 256 color support. For the original color scheme run:
 
 ```
 ./2048
