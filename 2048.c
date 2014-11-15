@@ -395,35 +395,21 @@ int main(int argc, char *argv[]) {
 		}
 		if (c=='q') {
 			printf("        QUIT? (y/n)         \n");
-			while (true) {
 			c=getchar();
-				if (c=='y'){
-					setBufferedInput(true);
-					printf("\033[?25h");
-					exit(0);
-				}
-				else {
-					drawBoard(board);
-					break;
-				}
+			if (c=='y'){
+				break;
 			}
+			drawBoard(board);
 		}
 		if (c=='r') {
 			printf("       RESTART? (y/n)       \n");
-			while (true) {
 			c=getchar();
-				if (c=='y'){
-					memset(board,0,sizeof(board));
-					addRandom(board);
-					addRandom(board);
-					drawBoard(board);
-					break;
-				}
-				else {
-					drawBoard(board);
-					break;
-				}
+			if (c=='y'){
+				memset(board,0,sizeof(board));
+				addRandom(board);
+				addRandom(board);
 			}
+			drawBoard(board);
 		}
 	}
 	setBufferedInput(true);
