@@ -34,13 +34,13 @@ void getColor(uint16_t value, char *color, size_t length) {
 			foreground+=2;
 		}
 	}
-	snprintf(color,length,"\033[38;5;%d;48;5;%dm",*foreground,*background);
+	snprintf(color,length,"\e[38;5;%d;48;5;%dm",*foreground,*background);
 }
 
 void drawBoard(uint16_t board[SIZE][SIZE]) {
 	int8_t x,y;
-	char color[40], reset[] = "\033[m";
-	printf("\033[H");
+	char color[40], reset[] = "\e[m";
+	printf("\e[H");
 
 	printf("2048.c %17d pts\n\n",score);
 
@@ -76,7 +76,6 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 	}
 	printf("\n");
 	printf("        ←,↑,→,↓ or q        \n");
-	printf("\033[A");
 }
 
 int8_t findTarget(uint16_t array[SIZE],int8_t x,int8_t stop) {
@@ -333,7 +332,7 @@ int test() {
 void signal_callback_handler(int signum) {
 	printf("         TERMINATED         \n");
 	setBufferedInput(true);
-	printf("\033[?25h");
+	printf("\e[?25h\e[m");
 	exit(signum);
 }
 
@@ -352,7 +351,7 @@ int main(int argc, char *argv[]) {
 		scheme = 2;
 	}
 
-	printf("\033[?25l\033[2J\033[H");
+	printf("\e[?25l\e[2J");
 
 	// register signal handler for when ctrl-c is pressed
 	signal(SIGINT, signal_callback_handler);
@@ -414,7 +413,7 @@ int main(int argc, char *argv[]) {
 	}
 	setBufferedInput(true);
 
-	printf("\033[?25h");
+	printf("\e[?25h\e[m");
 
 	return EXIT_SUCCESS;
 }
