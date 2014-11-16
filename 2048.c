@@ -76,6 +76,7 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 	}
 	printf("\n");
 	printf("        ←,↑,→,↓ or q        \n");
+	printf("\e[A"); // one line up
 }
 
 int8_t findTarget(uint16_t array[SIZE],int8_t x,int8_t stop) {
