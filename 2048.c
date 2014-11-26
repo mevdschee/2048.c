@@ -245,6 +245,14 @@ void addRandom(uint16_t board[SIZE][SIZE]) {
 	}
 }
 
+void initGame(uint16_t board[SIZE][SIZE]) {
+	memset(board,0,SIZE*SIZE*sizeof(uint16_t));
+	addRandom(board);
+	addRandom(board);
+	drawBoard(board);
+	score = 0;
+}
+
 void setBufferedInput(bool enable) {
 	static bool enabled = true;
 	static struct termios old;
@@ -357,10 +365,7 @@ int main(int argc, char *argv[]) {
 	// register signal handler for when ctrl-c is pressed
 	signal(SIGINT, signal_callback_handler);
 
-	memset(board,0,sizeof(board));
-	addRandom(board);
-	addRandom(board);
-	drawBoard(board);
+	initGame(board);
 	setBufferedInput(false);
 	while (true) {
 		c=getchar();
@@ -405,9 +410,7 @@ int main(int argc, char *argv[]) {
 			printf("       RESTART? (y/n)       \n");
 			c=getchar();
 			if (c=='y'){
-				memset(board,0,sizeof(board));
-				addRandom(board);
-				addRandom(board);
+				initGame(board);
 			}
 			drawBoard(board);
 		}
