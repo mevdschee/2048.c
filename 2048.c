@@ -245,8 +245,13 @@ void addRandom(uint16_t board[SIZE][SIZE]) {
 	}
 }
 
-void initGame(uint16_t board[SIZE][SIZE]) {
-	memset(board,0,SIZE*SIZE*sizeof(uint16_t));
+void initBoard(uint16_t board[SIZE][SIZE]) {
+	int8_t x,y;
+	for (x=0;x<SIZE;x++) {
+		for (y=0;y<SIZE;y++) {
+			board[x][y]=0;
+		}
+	}
 	addRandom(board);
 	addRandom(board);
 	drawBoard(board);
@@ -365,7 +370,7 @@ int main(int argc, char *argv[]) {
 	// register signal handler for when ctrl-c is pressed
 	signal(SIGINT, signal_callback_handler);
 
-	initGame(board);
+	initBoard(board);
 	setBufferedInput(false);
 	while (true) {
 		c=getchar();
@@ -410,7 +415,7 @@ int main(int argc, char *argv[]) {
 			printf("       RESTART? (y/n)       \n");
 			c=getchar();
 			if (c=='y'){
-				initGame(board);
+				initBoard(board);
 			}
 			drawBoard(board);
 		}
