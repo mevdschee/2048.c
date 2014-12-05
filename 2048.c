@@ -17,7 +17,7 @@
 #include <time.h>
 #include <signal.h>
 
-#define SIZE 4
+#define SIZE 8
 uint32_t score=0;
 uint8_t scheme=0;
 
@@ -117,7 +117,7 @@ bool slideArray(uint16_t array[SIZE]) {
 					score+=array[t]+array[x];
 					stop = t+1;
 				}
-				array[t]+=array[x];
+				array[t] += array[x];
 				array[x]=0;
 				success = true;
 			}
@@ -395,7 +395,7 @@ int main(int argc, char *argv[]) {
 		}
 		if (success) {
 			drawBoard(board);
-			usleep(150000);
+//			usleep(150000);
 			addRandom(board);
 			drawBoard(board);
 			if (gameEnded(board)) {
@@ -426,4 +426,3 @@ int main(int argc, char *argv[]) {
 
 	return EXIT_SUCCESS;
 }
-
