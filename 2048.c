@@ -58,11 +58,8 @@ void drawBoard(uint8_t board[SIZE][SIZE]) {
 			printf("%s",color);
 			if (board[x][y]!=0) {
 				char s[8];
-				if (SIZE<=4) {
-					snprintf(s,8,"%u",(uint32_t)1<<board[x][y]);
-				} else { // subhang mode ;-)
-					snprintf(s,8,"%u",board[x][y]);
-				}
+				snprintf(s,8,"%u",(uint32_t)1<<board[x][y]);
+				//snprintf(s,8,"%u",board[x][y]);
 				uint8_t t = 7-strlen(s);
 				printf("%*s%s%*s",t-t/2,"",s,t/2,"");
 			} else {
