@@ -115,9 +115,9 @@ bool slideArray(uint8_t array[SIZE]) {
 			// if target is not original position, then move or merge
 			if (t!=x) {
 				// if target is zero, this is a move
-				if (array[t]==0){
+				if (array[t]==0) {
 					array[t]=array[x];
-				} else if (array[t]==array[x]){
+				} else if (array[t]==array[x]) {
 					// merge (increase power of two)
 					array[t]++;
 					// increase score
@@ -136,8 +136,8 @@ bool slideArray(uint8_t array[SIZE]) {
 void rotateBoard(uint8_t board[SIZE][SIZE]) {
 	uint8_t i,j,n=SIZE;
 	uint8_t tmp;
-	for (i=0; i<n/2; i++){
-		for (j=i; j<n-i-1; j++){
+	for (i=0; i<n/2; i++) {
+		for (j=i; j<n-i-1; j++) {
 			tmp = board[i][j];
 			board[i][j] = board[j][n-i-1];
 			board[j][n-i-1] = board[n-i-1][n-j-1];
@@ -413,7 +413,7 @@ int main(int argc, char *argv[]) {
 		if (c=='q') {
 			printf("        QUIT? (y/n)         \n");
 			c=getchar();
-			if (c=='y'){
+			if (c=='y') {
 				break;
 			}
 			drawBoard(board);
@@ -421,7 +421,7 @@ int main(int argc, char *argv[]) {
 		if (c=='r') {
 			printf("       RESTART? (y/n)       \n");
 			c=getchar();
-			if (c=='y'){
+			if (c=='y') {
 				initBoard(board);
 			}
 			drawBoard(board);
