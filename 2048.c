@@ -20,7 +20,12 @@
 #define SIZE 4
 uint32_t score=0;
 uint8_t scheme=0;
+int mode = 1;
 
+void switch_mode(){
+	if(mode == 0) mode = 1;
+	else mode = 0;
+}
 void getColor(uint16_t value, char *color, size_t length) {
 	uint8_t original[] = {8,255,1,255,2,255,3,255,4,255,5,255,6,255,7,255,9,0,10,0,11,0,12,0,13,0,14,0,255,0,255,0};
 	uint8_t blackwhite[] = {232,255,234,255,236,255,238,255,240,255,242,255,244,255,246,0,248,0,249,0,250,0,251,0,252,0,253,0,254,0,255,0};
@@ -37,8 +42,19 @@ void getColor(uint16_t value, char *color, size_t length) {
 	snprintf(color,length,"\e[38;5;%d;48;5;%dm",*foreground,*background);
 }
 
+char get_char(int val){
+
+char c = 'A';
+int i;
+for (i = 2;i <= val;i = i*2){
+	if(i == val) return c;
+	c = c+1;
+
+} 
+}
 void drawBoard(uint16_t board[SIZE][SIZE]) {
 	int8_t x,y;
+	char c;
 	char color[40], reset[] = "\e[m";
 	printf("\e[H");
 
@@ -57,7 +73,13 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 			printf("%s",color);
 			if (board[x][y]!=0) {
 				char s[8];
-				snprintf(s,8,"%u",board[x][y]);
+				if(mode == 0){	//if SPACE is pressed Mode changes from Numbered to A-Z
+					c = get_char(board[x][y]);		
+					snprintf(s,8,"%c",c);
+				}
+				else{
+					snprintf(s,8,"%u",board[x][y]);
+				}
 				int8_t t = 7-strlen(s);
 				printf("%*s%s%*s",t-t/2,"",s,t/2,"");
 			} else {
@@ -75,7 +97,12 @@ void drawBoard(uint16_t board[SIZE][SIZE]) {
 		printf("\n");
 	}
 	printf("\n");
-	printf("        ←,↑,→,↓ or q        \n");
+	if(mode == 1){
+		printf("        ←,↑,→,↓ or q                        PRESS SPACE For A-Z Mode\n");
+	}
+	else if(mode == 0){
+		printf("        ←,↑,→,↓ or q                        PRESS SPACE For Numbered Mode\n");
+	}
 	printf("\e[A"); // one line up
 }
 
@@ -390,12 +417,16 @@ int main(int argc, char *argv[]) {
 			case 115:	// 's' key
 			case 106:	// 'j' key
 			case 66:	// down arrow
+			
 				success = moveDown(board);  break;
+			case 32:        //space key
+				switch_mode();
+				drawBoard(board);           break;
 			default: success = false;
 		}
 		if (success) {
 			drawBoard(board);
-			usleep(150000);
+//			usleep(150000);
 			addRandom(board);
 			drawBoard(board);
 			if (gameEnded(board)) {
@@ -426,4 +457,3 @@ int main(int argc, char *argv[]) {
 
 	return EXIT_SUCCESS;
 }
-

@@ -26,6 +26,7 @@ gcc -o 2048 2048.c
 
 The game supports different color schemes. This depends on ANSI support for 88 or 256 colors. If there are not enough colors supported the game will fallback to black and white (still very much playable). For the original color scheme run:
 
+For Changing From Numbered Mode to A-Z mode Press Space
 ```
 ./2048
 ```
