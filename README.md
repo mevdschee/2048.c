@@ -41,6 +41,16 @@ For the blue-to-red color scheme (requires 256 colors):
 ./2048 bluered
 ```
 
+### Implemention on multi-user machines
+
+To use this game on multi-user machines (to make all users able to play the game and add records to high scores):
+1- login as root
+2- change SCORE\_FILE in 2048.c to "/etc/2048\_score\_file"
+3- copy score\_file shipped with the game to /etc/2048\_score\_file 
+4- `gcc 2048.c -o 2048`
+5- copy 2048 to /usr/local/games/2048
+6- `chown root /usr/local/games/2048; chmod 6111 /usr/local/games/2048; chown root /etc/2048_score_file; chmod 600 /etc/2048_score_file`
+
 ### Contributing
 
 Contributions are very welcome. Always run the tests before committing using:

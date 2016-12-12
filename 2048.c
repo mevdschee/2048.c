@@ -17,9 +17,92 @@
 #include <time.h>
 #include <signal.h>
 
+
 #define SIZE 4
 uint32_t score=0;
 uint8_t scheme=0;
+typedef struct score_rec SCORE;
+
+#define SCORE_FILE "/etc/2048_score_file" // change this for example to something like
+                      // "/etc/2048_score_file"
+                      // or change it to "" if you don't want to have highscores.
+#define HIGHNUMS 5 // number of high scores records
+#define MAX_NAME_LEN 35 // i think max length of username in GNU/Linux is 33
+                    // you can test with useradd!
+
+struct score_rec{
+    char name[MAX_NAME_LEN];
+    int score;
+}highscores[HIGHNUMS + 1], myscore;
+
+
+void sort_by_score(){ // i use bubble sort because i don't know any algorithm else!
+    int changed = 1;
+    while(changed){
+        int i;
+        changed = 0;
+        for (i = 0; i < HIGHNUMS + 1; i++){
+            if (i == HIGHNUMS){
+                // we can't compare the last element with its next element!
+                continue;
+            }
+            if (highscores[i].score < highscores[i + 1].score){
+                SCORE temp = highscores[i + 1];
+                highscores[i + 1] = highscores[i];
+                highscores[i] = temp;
+                changed = 1;
+            }
+        }
+    }
+}
+
+void print_highscores(){
+    int i;
+    printf("Name\t\t\t\tScore\n"); //each tab is 8
+    char *line = "===========================================";
+    puts(line);
+
+    for (i = 0; i < HIGHNUMS; i++){
+        printf("%s\t\t\t\t%d\n", highscores[i].name, highscores[i].score);
+    }
+
+    puts(line);
+}
+
+void  highscores_(char *myname){ //TODO: better name for this function
+    FILE *fd;
+    fd = fopen(SCORE_FILE, "r");
+    if (!fd){
+        puts("Error! could not open file!");
+        return;
+    }
+    int bf; // bytes raden
+    if ((bf = fread(highscores, 1, 200, fd)) < sizeof(SCORE) * HIGHNUMS){
+        puts("Err");
+        printf("red %d bytes\n", bf);
+        return;
+        //TODO: better Error message?
+        //NOTE: the game does not create a default score file itself, so:
+        //TODO: a mechanism that: checks that score file exists or not and if
+        //       it didn't exist it will create one
+    }
+    fclose(fd); // first we read all records and store them in highscores
+    
+
+    strcpy(highscores[HIGHNUMS].name, myname);
+    highscores[HIGHNUMS].score = score; // then we add the new score to the end of records
+    
+
+    sort_by_score();
+
+    fd = fopen(SCORE_FILE, "w");
+    fwrite(highscores, 1, 200, fd);// TODO: it should be fwrite(highscores, sizeof(SCORE), HIGHNUMS, fd)
+    fclose(fd);// writing the first HIGHNUMS records to file
+    print_highscores(); // printing them
+    //TODO? more pretty printing?
+    // like highlighting the 1st record or the new record?
+
+}
 
 void getColor(uint8_t value, char *color, size_t length) {
 	uint8_t original[] = {8,255,1,255,2,255,3,255,4,255,5,255,6,255,7,255,9,0,10,0,11,0,12,0,13,0,14,0,255,0,255,0};
@@ -357,10 +440,11 @@ void signal_callback_handler(int signum) {
 	exit(signum);
 }
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[], char *env[]) {
 	uint8_t board[SIZE][SIZE];
 	char c;
 	bool success;
+    char myname[MAX_NAME_LEN];
 
 	if (argc == 2 && strcmp(argv[1],"test")==0) {
 		return test();
@@ -371,6 +455,16 @@ int main(int argc, char *argv[]) {
 	if (argc == 2 && strcmp(argv[1],"bluered")==0) {
 		scheme = 2;
 	}
+
+    int i;
+    for (i = 0; env[i]; i++){
+        // myname will be username of user stored in USER enviroment variable
+        if (strstr(env[i], "USER") != NULL){
+            strtok(env[i], "=");
+            strcpy(myname, strtok(NULL, "="));
+        }
+ 
+    }
 
 	printf("\033[?25l\033[2J");
 
@@ -430,6 +524,10 @@ int main(int argc, char *argv[]) {
 	setBufferedInput(true);
 
 	printf("\033[?25h\033[m");
+    
+
+    if(strcmp(SCORE_FILE, "")) highscores_(myname);
+
 
 	return EXIT_SUCCESS;
 }
