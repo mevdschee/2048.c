@@ -56,6 +56,9 @@ To use this game on multi-user machines (to make all users able to play the game
 
 6- `chown root /usr/local/games/2048; chmod 6111 /usr/local/games/2048; chown root /etc/2048_score_file; chmod 600 /etc/2048_score_file`
 
+### Compiling for single player use
+
+Simply change SCORE\_FILE to "" in 2048.c and it will not show highscores table!
 
 ### Contributing
 
