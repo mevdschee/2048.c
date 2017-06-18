@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 echo "[8 colors] => ^[[4#m"
 for color in {0..7} ; do
 	#Display the color
