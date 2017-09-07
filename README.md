@@ -12,7 +12,7 @@ You can move the tiles in four directions using the arrow keys: up, down, left, 
 ### Requirements
 
 - C compiler
-- GNU/Linux or FreeBSD
+- Tested on: GNU/Linux, FreeBSD, OpenBSD
 
 ### Installation
 
