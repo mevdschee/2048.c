@@ -419,7 +419,7 @@ int main(int argc, char *argv[]) {
 		if (success) {
 			// checking if Terminal height as width was changed
 			ioctl(STDOUT_FILENO, TIOCGWINSZ, &TerminalSize_new);
-			if (TerminalSize.ws_row != TerminalSize_new.ws_row || TerminalSize.ws_row != TerminalSize_new.ws_col){
+			if (TerminalSize.ws_row != TerminalSize_new.ws_row || TerminalSize.ws_col != TerminalSize_new.ws_col){
 				clear_screen();
 				TerminalSize = TerminalSize_new;
 			}
