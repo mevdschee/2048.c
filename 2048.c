@@ -186,23 +186,14 @@ bool moveRight(uint8_t board[SIZE][SIZE]) {
 }
 
 bool findPairDown(uint8_t board[SIZE][SIZE]) {
+	bool success = false;
 	uint8_t x,y;
-	for (x = 0; x < SIZE; x++) {
-		for ( y = 0; y < SIZE - 1; y++) {
-			if (board[x][y] == board[x][y + 1]) return true;
+	for (x=0;x<SIZE;x++) {
+		for (y=0;y<SIZE-1;y++) {
+			if (board[x][y]==board[x][y+1]) return true;
 		}
 	}
-	return false;
-}
-
-bool findPairSide(uint8_t board[SIZE][SIZE]) {
-	uint8_t x,y;
-	for(y = 0; y < SIZE; y++) {
-		for(x=0; x < SIZE-1; x++) {
-			if (board[x][y] == board[x + 1][y]) return true;
-		}
-	}
-	return false;
+	return success;
 }
 
 uint8_t countEmpty(uint8_t board[SIZE][SIZE]) {
@@ -222,8 +213,12 @@ bool gameEnded(uint8_t board[SIZE][SIZE]) {
 	bool ended = true;
 	if (countEmpty(board)>0) return false;
 	if (findPairDown(board)) return false;
-	if (findPairDown(board)) return false;
-	return true;
+	rotateBoard(board);
+	if (findPairDown(board)) ended = false;
+	rotateBoard(board);
+	rotateBoard(board);
+	rotateBoard(board);
+	return ended;
 }
 
 void addRandom(uint8_t board[SIZE][SIZE]) {
