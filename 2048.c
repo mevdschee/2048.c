@@ -358,10 +358,6 @@ void signal_callback_handler(int signum) {
 	exit(signum);
 }
 
-void clear_screen(){
-	system("clear"); // TODO: find a cleaner way!
-}
-
 int main(int argc, char *argv[]) {
 	uint8_t board[SIZE][SIZE];
 	char c;
@@ -412,7 +408,7 @@ int main(int argc, char *argv[]) {
 			case 66:	// down arrow
 				success = moveDown(board);  break;
 			case 12:        // CtrlL
-				clear_screen();
+				printf("\033[2J"); // clearing the screen
 				drawBoard(board);
 			default: success = false;
 		}
