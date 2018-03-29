@@ -407,17 +407,17 @@ int main(int argc, char *argv[]) {
 			case 106:	// 'j' key
 			case 66:	// down arrow
 				success = moveDown(board);  break;
-			case 12:        // CtrlL
+			case 12:    // CtrlL
 				printf("\033[2J"); // clearing the screen
 				drawBoard(board);
 			default: success = false;
 		}
 		if (success) {
 			// checking if Terminal height and width was changed
-			ioctl(STDOUT_FILENO, TIOCGWINSZ, &TerminalSize_new);
-			if (TerminalSize.ws_row != TerminalSize_new.ws_row || TerminalSize.ws_col != TerminalSize_new.ws_col){
-				printf("\033[2J");
-				TerminalSize = TerminalSize_new;
+		    ioctl(STDOUT_FILENO, TIOCGWINSZ, &TerminalSize_new);
+		    if (TerminalSize.ws_row != TerminalSize_new.ws_row || TerminalSize.ws_col != TerminalSize_new.ws_col){
+			    printf("\033[2J");
+			    TerminalSize = TerminalSize_new;
 			}
 			drawBoard(board);
 			usleep(150000);
