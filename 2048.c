@@ -16,123 +16,31 @@
 #include <stdint.h>
 #include <time.h>
 #include <signal.h>
-
+#include <limits.h>
+#include <sys/types.h>
+#include <pwd.h>
 
 #define SIZE 4
-#define HIGHNUMS 10 // number of high scores records
-#define MAX_NAME_LEN 35
-// after creating several users on my computer,
-// it seems maximum length of user name is 35 characters
-// ^TODO: replace it with a pre-defined constant
+
+#define HIGHSCORES_DEFAULT_NAME "foo"
+#define HIGHSCORES_DEFAULT_SCORE 1000
+// ^ these are the default name and score which will be used when creating
+//   a default score file.
+#define HIGHSCORES_NUMBER 10 // How many highscores in a file?
+
+#define LOGIN_NAME_USUAL 32
+
+char score_file0[FILENAME_MAX + 1], score_file1[FILENAME_MAX + 1] = "";
+char *score_file;
+char player_name[LOGIN_NAME_MAX + 1];
+
+struct score_rec{
+	char name[LOGIN_NAME_MAX + 1];
+	uint32_t score;
+} highscores[HIGHSCORES_NUMBER + 1], player_score_rec;
 
 uint32_t score=0;
 uint8_t scheme=0;
-char score_file[FILENAME_MAX + 1];
-char score_file1[FILENAME_MAX] = "";
-char myname[MAX_NAME_LEN]; // player's name
-typedef struct score_rec SCORE;
-
-
-struct score_rec{
-    char name[MAX_NAME_LEN];
-    int score;
-}highscores[HIGHNUMS + 1], myscore;
-// one extra for the player who is playing now.
-// we need space in memory to process the table,
-// but it won't be saved to the score file
-
-void sort_by_score(){
-    // used bubble sort algorithm because I didn't know
-    // anything else.
-    int changed = 1;
-    while(changed){
-        int i;
-        changed = 0;
-        for (i = 0; i <=HIGHNUMS; i++){
-            if (i == HIGHNUMS){
-                // we can't compare the last element with its next element!
-                continue;
-            }
-            if (highscores[i].score < highscores[i + 1].score){
-                SCORE temp = highscores[i + 1];
-                highscores[i + 1] = highscores[i];
-                highscores[i] = temp;
-                changed = 1;
-            }
-        }
-    }
-}
-
-void print_highscores(){
-    //TODO: prettier printing
-    int i;
-    printf("Name\t\t\t\tScore\n"); //each tab is 8
-    char *line = "===========================================";
-    puts(line);
-
-    for (i = 0; i < HIGHNUMS; i++){
-        printf("%s\t\t\t\t%d\n", highscores[i].name, highscores[i].score);
-    }
-
-    puts(line);
-}
-
-int mkscore_file(){
-    // creates a sample score file
-    // returns 1 if it couldn't open file for writing
-    // and 2 if file was opened but it couldn't write
-    // to it successfully, 0 if it was successful.
-    FILE *fp;
-    fp = fopen(score_file, "w");
-    if (!fp){
-        return 1;
-    }
-    SCORE sample_scores[HIGHNUMS];
-    for (int i = 0; i < HIGHNUMS; i++){
-        strcpy(sample_scores[i].name, "foo");
-        sample_scores[i].score = 700;
-    }
-    int written_bytes = fwrite(sample_scores, sizeof(SCORE), HIGHNUMS, fp);
-    if (written_bytes < HIGHNUMS)
-        return 2;
-    fclose(fp);
-    return 0;
-}
-
-
-int highscores_(){
-    //TODO: better name for this function
-    int b = 100;
-    if (access(score_file, F_OK) && (b = mkscore_file())){
-        if (!strcmp(score_file, score_file1)){
-            fprintf(stderr, "Cannot make score file: %s\n", score_file);
-            exit(-1);
-        }else{
-            strcpy(score_file, score_file1);
-            exit(highscores_());
-        }
-    }
-    FILE *fd;
-    fd = fopen(score_file, "r+");
-    if (!fd){
-        if (!strcmp(score_file, score_file1)){
-            fprintf(stderr, "Cannot read score file: %s\n", score_file);
-            exit(-1);
-        }else{
-            strcpy(score_file, score_file1);
-            exit(highscores_());
-        }
-    }
-    fread(highscores, sizeof(SCORE), HIGHNUMS, fd);
-    fseek(fd, 0, SEEK_SET);
-    strcpy(highscores[HIGHNUMS].name, myname);
-    highscores[HIGHNUMS].score = score;
-    sort_by_score();
-    fwrite(highscores, sizeof(SCORE), HIGHNUMS, fd);
-    fclose(fd);
-    print_highscores();
-}
-
 
 void getColor(uint8_t value, char *color, size_t length) {
 	uint8_t original[] = {8,255,1,255,2,255,3,255,4,255,5,255,6,255,7,255,9,0,10,0,11,0,12,0,13,0,14,0,255,0,255,0};
@@ -470,14 +378,111 @@ void signal_callback_handler(int signum) {
 	exit(signum);
 }
 
-int main(int argc, char *argv[]){
+int make_score_file(const char *file_path){
+	FILE *fp;
+	fp = fopen(file_path, "w");
+
+	if (!fp){
+		return EXIT_FAILURE;
+	}
+	struct score_rec default_scores[HIGHSCORES_NUMBER];
+	for (uint32_t i = 0; i < HIGHSCORES_NUMBER; i++){
+		strcpy(default_scores[i].name, HIGHSCORES_DEFAULT_NAME);
+		default_scores[i].score = HIGHSCORES_DEFAULT_SCORE;
+	}
+	uint32_t w_items = fwrite(default_scores, sizeof(struct score_rec),HIGHSCORES_NUMBER, fp);
+	fclose(fp);
+	if (w_items != HIGHSCORES_NUMBER){
+		return EXIT_FAILURE;
+	}
+	return EXIT_SUCCESS;
+}
+
+void which_score_file(){
+	if (access(score_file, F_OK) != 0){
+		if (make_score_file(score_file) == EXIT_FAILURE){
+			if (score_file == score_file1){
+				score_file = NULL;
+                return;
+			}else{
+				score_file = score_file1;
+				which_score_file();
+				return;
+			}
+		}
+	}
+	FILE *fp;
+	fp = fopen(score_file, "r+");
+	if (fp == NULL){
+		if (score_file == score_file1){
+			score_file = NULL;
+            return;
+		}else{
+			score_file = score_file1;
+			which_score_file();
+			return;
+		}
+	}
+	fclose(fp);
+	return;
+}
+
+void sort_highscores(){
+	bool changed = true;
+	while (changed){
+		changed = false;
+		for (uint32_t i = 0; i < HIGHSCORES_NUMBER + 1; i++){
+			if (i == HIGHSCORES_NUMBER){
+				continue;
+			}
+			if (highscores[i].score < highscores[i + 1].score){
+				struct score_rec temp = highscores[i + 1];
+				highscores[i + 1] = highscores[i];
+				highscores[i] = temp;
+				changed = true;
+			}
+		}
+	}
+}
+
+void update_highscores(){
+	FILE *fp;
+	fp = fopen(score_file, "r+");
+	if (!fp){
+		fprintf(stderr, "Error opening score file for reading and writing");
+		exit(EXIT_FAILURE);
+	}
+	fread(highscores, sizeof(struct score_rec), HIGHSCORES_NUMBER, fp);
+	fseek(fp, 0, SEEK_SET);
+	strcpy(highscores[HIGHSCORES_NUMBER].name, player_name);
+	highscores[HIGHSCORES_NUMBER].score = score;
+	sort_highscores();
+	fwrite(highscores, sizeof(struct score_rec), HIGHSCORES_NUMBER, fp);
+	fclose(fp);
+
+}
+
+void print_highscores(){
+    //TODO: prettier printing
+	char line[LOGIN_NAME_USUAL + 6 + 1] = {0};
+	memset(line, ' ', LOGIN_NAME_USUAL - 4 - 6);
+    printf("Name%sScore\n", line);
+	memset(line, '=', LOGIN_NAME_USUAL + 6);
+    puts(line);
+    memset(line, 0, LOGIN_NAME_USUAL + 6 + 1);
+
+    for (uint32_t i = 0; i < HIGHSCORES_NUMBER; i++){
+		memset(line, ' ', LOGIN_NAME_USUAL - 6 - strlen(highscores[i].name));
+        printf("%s%s%d\n", highscores[i].name, line, highscores[i].score);
+    }
+}
+
+
+
+int main(int argc, char *argv[]) {
 	uint8_t board[SIZE][SIZE];
 	char c;
 	bool success;
-    strcpy(score_file, "/var/games/2048scores");
-    strcpy(score_file1, "/home/");
-    strcat(score_file1, getlogin());
-    strcat(score_file1, "/.2048scores");
 
 	if (argc == 2 && strcmp(argv[1],"test")==0) {
 		return test();
@@ -489,7 +494,8 @@ int main(int argc, char *argv[]){
 		scheme = 2;
 	}
 
-    strcpy(myname, getlogin());
+
+		
 
 	printf("\033[?25l\033[2J");
 
@@ -521,8 +527,6 @@ int main(int argc, char *argv[]){
 			case 106:	// 'j' key
 			case 66:	// down arrow
 				success = moveDown(board);  break;
-            case 99: // 'c' key
-                score += 500; break;
 			default: success = false;
 		}
 		if (success) {
@@ -552,9 +556,24 @@ int main(int argc, char *argv[]){
 			drawBoard(board);
 		}
 	}
-
 	setBufferedInput(true);
+
 	printf("\033[?25h\033[m");
 
-    return highscores_();
+
+	strcpy(player_name, getpwuid(geteuid())->pw_name);
+	strcpy(score_file0, "/var/games/2048scores");
+	strcpy(score_file1, getpwuid(geteuid())->pw_dir);
+	strcat(score_file1, "/.2048scores");
+	score_file = score_file0;
+
+    which_score_file(); // which score file should we use?
+	if (score_file == NULL){
+		fprintf(stderr, "Could not use any of highscores\n");
+		return EXIT_FAILURE;
+	}
+	update_highscores(); // reads high scores from disk, sorts them and again writes to disk
+	print_highscores();
+
+	return EXIT_SUCCESS;
 }
