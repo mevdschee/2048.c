@@ -403,7 +403,7 @@ void which_score_file(){
 		if (make_score_file(score_file) == EXIT_FAILURE){
 			if (score_file == score_file1){
 				score_file = NULL;
-                return;
+				return;
 			}else{
 				score_file = score_file1;
 				which_score_file();
@@ -416,7 +416,7 @@ void which_score_file(){
 	if (fp == NULL){
 		if (score_file == score_file1){
 			score_file = NULL;
-            return;
+			return;
 		}else{
 			score_file = score_file1;
 			which_score_file();
@@ -463,18 +463,18 @@ void update_highscores(){
 }
 
 void print_highscores(){
-    //TODO: prettier printing
+	//TODO: prettier printing
 	char line[LOGIN_NAME_USUAL + 6 + 1] = {0};
 	memset(line, ' ', LOGIN_NAME_USUAL - 4 - 6);
-    printf("Name%sScore\n", line);
+	printf("Name%sScore\n", line);
 	memset(line, '=', LOGIN_NAME_USUAL + 6);
-    puts(line);
-    memset(line, 0, LOGIN_NAME_USUAL + 6 + 1);
+	puts(line);
+	memset(line, 0, LOGIN_NAME_USUAL + 6 + 1);
 
-    for (uint32_t i = 0; i < HIGHSCORES_NUMBER; i++){
+	for (uint32_t i = 0; i < HIGHSCORES_NUMBER; i++){
 		memset(line, ' ', LOGIN_NAME_USUAL - 6 - strlen(highscores[i].name));
-        printf("%s%s%d\n", highscores[i].name, line, highscores[i].score);
-    }
+		printf("%s%s%d\n", highscores[i].name, line, highscores[i].score);
+	}
 }
 
 
@@ -567,7 +567,7 @@ int main(int argc, char *argv[]) {
 	strcat(score_file1, "/.2048scores");
 	score_file = score_file0;
 
-    which_score_file(); // which score file should we use?
+	which_score_file(); // which score file should we use?
 	if (score_file == NULL){
 		fprintf(stderr, "Could not use any of highscores\n");
 		return EXIT_FAILURE;
