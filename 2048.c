@@ -22,8 +22,8 @@
 
 #define SIZE 4
 
-#define HIGHSCORES_DEFAULT_NAME "mevdschee"
-#define HIGHSCORES_DEFAULT_SCORE 10
+#define HIGHSCORES_DEFAULT_NAME "foo"
+#define HIGHSCORES_DEFAULT_SCORE 1000
 // ^ these are the default name and score which will be used when creating
 //   a default score file.
 #define HIGHSCORES_NUMBER 10 // How many highscores in a file?
@@ -378,7 +378,11 @@ void signal_callback_handler(int signum) {
 	exit(signum);
 }
 
-int make_score_file(const char *file_path){
+int compareScorerecs(const void *a, const void *b){
+    return ((struct score_rec *)b)->score - ((struct score_rec *)a)->score;
+}
+
+int makeScorefile(const char *file_path){
 	FILE *fp;
 	fp = fopen(file_path, "w");
 
@@ -398,15 +402,15 @@ int make_score_file(const char *file_path){
 	return EXIT_SUCCESS;
 }
 
-void which_score_file(){
+void whichScorefile(){
 	if (access(score_file, F_OK) != 0){
-		if (make_score_file(score_file) == EXIT_FAILURE){
+		if (makeScorefile(score_file) == EXIT_FAILURE){
 			if (score_file == score_file1){
 				score_file = NULL;
-				return;
+                return;
 			}else{
 				score_file = score_file1;
-				which_score_file();
+				whichScorefile();
 				return;
 			}
 		}
@@ -416,10 +420,10 @@ void which_score_file(){
 	if (fp == NULL){
 		if (score_file == score_file1){
 			score_file = NULL;
-			return;
+            return;
 		}else{
 			score_file = score_file1;
-			which_score_file();
+			whichScorefile();
 			return;
 		}
 	}
@@ -427,25 +431,7 @@ void which_score_file(){
 	return;
 }
 
-void sort_highscores(){
-	bool changed = true;
-	while (changed){
-		changed = false;
-		for (uint32_t i = 0; i < HIGHSCORES_NUMBER + 1; i++){
-			if (i == HIGHSCORES_NUMBER){
-				continue;
-			}
-			if (highscores[i].score < highscores[i + 1].score){
-				struct score_rec temp = highscores[i + 1];
-				highscores[i + 1] = highscores[i];
-				highscores[i] = temp;
-				changed = true;
-			}
-		}
-	}
-}
-
-void update_highscores(){
+void updateHighscores(){
 	FILE *fp;
 	fp = fopen(score_file, "r+");
 	if (!fp){
@@ -456,25 +442,26 @@ void update_highscores(){
 	fseek(fp, 0, SEEK_SET);
 	strcpy(highscores[HIGHSCORES_NUMBER].name, player_name);
 	highscores[HIGHSCORES_NUMBER].score = score;
-	sort_highscores();
+    qsort(&highscores, HIGHSCORES_NUMBER + 1, sizeof(struct score_rec),
+    compareScorerecs);
 	fwrite(highscores, sizeof(struct score_rec), HIGHSCORES_NUMBER, fp);
 	fclose(fp);
 
 }
 
-void print_highscores(){
-	//TODO: prettier printing
+void printHighscores(){
+    //TODO: prettier printing
 	char line[LOGIN_NAME_USUAL + 6 + 1] = {0};
 	memset(line, ' ', LOGIN_NAME_USUAL - 4 - 6);
-	printf("Name%sScore\n", line);
+    printf("Name%sScore\n", line);
 	memset(line, '=', LOGIN_NAME_USUAL + 6);
-	puts(line);
-	memset(line, 0, LOGIN_NAME_USUAL + 6 + 1);
+    puts(line);
+    memset(line, 0, LOGIN_NAME_USUAL + 6 + 1);
 
-	for (uint32_t i = 0; i < HIGHSCORES_NUMBER; i++){
+    for (uint32_t i = 0; i < HIGHSCORES_NUMBER; i++){
 		memset(line, ' ', LOGIN_NAME_USUAL - 6 - strlen(highscores[i].name));
-		printf("%s%s%d\n", highscores[i].name, line, highscores[i].score);
-	}
+        printf("%s%s%d\n", highscores[i].name, line, highscores[i].score);
+    }
 }
 
 
@@ -567,13 +554,13 @@ int main(int argc, char *argv[]) {
 	strcat(score_file1, "/.2048scores");
 	score_file = score_file0;
 
-	which_score_file(); // which score file should we use?
+    whichScorefile(); // which score file should we use?
 	if (score_file == NULL){
 		fprintf(stderr, "Could not use any of highscores\n");
 		return EXIT_FAILURE;
 	}
-	update_highscores(); // reads high scores from disk, sorts them and again writes to disk
-	print_highscores();
+	updateHighscores(); // reads high scores from disk, sorts them and again writes to disk
+	printHighscores();
 
 	return EXIT_SUCCESS;
 }
