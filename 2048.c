@@ -23,7 +23,7 @@
 #define SIZE 4
 
 #define HIGHSCORES_DEFAULT_NAME "foo"
-#define HIGHSCORES_DEFAULT_SCORE 1000
+#define HIGHSCORES_DEFAULT_SCORE 10
 // ^ these are the default name and score which will be used when creating
 //   a default score file.
 #define HIGHSCORES_NUMBER 10 // How many highscores in a file?
