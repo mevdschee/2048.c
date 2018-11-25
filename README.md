@@ -1,7 +1,7 @@
 2048.c
 ======
 
-![screenshot](https://www.leaseweb.com/labs/wp-content/uploads/2014/03/20481.png)
+![screenshot](screenshot.png)
 
 Console version of the game "2048" for GNU/Linux
 
