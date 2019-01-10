@@ -39,7 +39,6 @@ void getColor(uint8_t value, char *color, size_t length) {
 
 void drawBoard(uint8_t board[SIZE][SIZE]) {
 	uint8_t x,y;
-	char c;
 	char color[40], reset[] = "\033[m";
 	printf("\033[H");
 
@@ -86,7 +85,7 @@ uint8_t findTarget(uint8_t array[SIZE],uint8_t x,uint8_t stop) {
 	if (x==0) {
 		return x;
 	}
-	for(t=x-1;t>=0;t--) {
+	for(t=x-1;;t--) {
 		if (array[t]!=0) {
 			if (array[t]!=array[x]) {
 				// merge is not possible, take next position
