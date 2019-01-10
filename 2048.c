@@ -85,7 +85,7 @@ uint8_t findTarget(uint8_t array[SIZE],uint8_t x,uint8_t stop) {
 	if (x==0) {
 		return x;
 	}
-	for(t=x-1;t>=0;t--) {
+	for(t=x-1;;t--) {
 		if (array[t]!=0) {
 			if (array[t]!=array[x]) {
 				// merge is not possible, take next position
