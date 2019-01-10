@@ -39,7 +39,6 @@ void getColor(uint8_t value, char *color, size_t length) {
 
 void drawBoard(uint8_t board[SIZE][SIZE]) {
 	uint8_t x,y;
-	char c;
 	char color[40], reset[] = "\033[m";
 	printf("\033[H");
 
