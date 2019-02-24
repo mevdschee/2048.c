@@ -20,7 +20,8 @@
 */
 void signal_callback_handler(int signum);
 void setBufferedInput(bool enable);
-
+void getColor(uint8_t value, char *color, size_t length);
+void drawBoard(uint8_t board[SIZE][SIZE]);
 /*
 =============================================================================
 
@@ -32,7 +33,15 @@ void setBufferedInput(bool enable);
 */
 int test();
 
+/*
+=============================================================================
 
+
+                        GAME LOGIC DEFENITIONS
+
+
+=============================================================================
+*/
 void initBoard(uint8_t board[SIZE][SIZE]);
 void addRandom(uint8_t board[SIZE][SIZE]);
 bool gameEnded(uint8_t board[SIZE][SIZE]);
@@ -45,6 +54,6 @@ bool moveRight(uint8_t board[SIZE][SIZE]);
 void rotateBoard(uint8_t board[SIZE][SIZE]);
 bool slideArray(uint8_t array[SIZE]);
 uint8_t findTarget(uint8_t array[SIZE],uint8_t x,uint8_t stop);
-void drawBoard(uint8_t board[SIZE][SIZE]);
-void getColor(uint8_t value, char *color, size_t length);
+
+
 #endif /* end of include guard: 2048.H */
