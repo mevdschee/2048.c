@@ -8,9 +8,31 @@
  ============================================================================
  */
 #define SIZE 4
-void signal_callback_handler(int signum) ;
-int test();
+
+/*
+=============================================================================
+
+
+                             SYSTEM DEFENITIONS
+
+
+=============================================================================
+*/
+void signal_callback_handler(int signum);
 void setBufferedInput(bool enable);
+
+/*
+=============================================================================
+
+
+                            TEST DEFENITIONS
+
+
+=============================================================================
+*/
+int test();
+
+
 void initBoard(uint8_t board[SIZE][SIZE]);
 void addRandom(uint8_t board[SIZE][SIZE]);
 bool gameEnded(uint8_t board[SIZE][SIZE]);
