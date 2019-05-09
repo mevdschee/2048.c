@@ -28,6 +28,7 @@ gcc -o 2048 2048.c
 ### Correr el juego
 
 El juego soporta diferentes esquemas de colores. Esto depende del soporte ANSI para 88 o 256 colores. Si no hay los suficientes colores soportados, el juego irá del blanco al negro (mucho más apto para jugar). Para el esquema de colores original, pone en consola:
+
 ```
 ./2048
 ```
