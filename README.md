@@ -1,7 +1,7 @@
 2048.c
 ======
 
-[Spanish](README.es.md)
+[Spanish](README_es.md)
 
 ![screenshot](screenshot.png)
 
