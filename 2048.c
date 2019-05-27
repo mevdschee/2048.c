@@ -16,6 +16,8 @@
 #include <stdint.h>
 #include <time.h>
 #include <signal.h>
+// Locale language
+#include "language_header.h"
 
 #define SIZE 4
 uint32_t score=0;
@@ -75,7 +77,7 @@ void drawBoard(uint8_t board[SIZE][SIZE]) {
 		printf("\n");
 	}
 	printf("\n");
-	printf("        ←,↑,→,↓ or q        \n");
+	printf("        ←,↑,→,↓ %s q        \n",LOCALE_WORDS[0]);
 	printf("\033[A"); // one line up
 }
 
@@ -350,7 +352,7 @@ int test() {
 }
 
 void signal_callback_handler(int signum) {
-	printf("         TERMINATED         \n");
+	printf("         %s         \n",LOCALE_WORDS[1]);
 	setBufferedInput(true);
 	printf("\033[?25h\033[m");
 	exit(signum);
@@ -409,12 +411,12 @@ int main(int argc, char *argv[]) {
 			addRandom(board);
 			drawBoard(board);
 			if (gameEnded(board)) {
-				printf("         GAME OVER          \n");
+				printf("         %s          \n",LOCALE_WORDS[2]);
 				break;
 			}
 		}
 		if (c=='q') {
-			printf("        QUIT? (y/n)         \n");
+			printf("        %s (y/n)         \n",LOCALE_WORDS[3]);
 			c=getchar();
 			if (c=='y') {
 				break;
@@ -422,7 +424,7 @@ int main(int argc, char *argv[]) {
 			drawBoard(board);
 		}
 		if (c=='r') {
-			printf("       RESTART? (y/n)       \n");
+			printf("       %s (y/n)       \n",LOCALE_WORDS[4]);
 			c=getchar();
 			if (c=='y') {
 				initBoard(board);

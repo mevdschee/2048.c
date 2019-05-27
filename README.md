@@ -44,6 +44,20 @@ For the blue-to-red color scheme (requires 256 colors):
 ./2048 bluered
 ```
 
+#### Internationalization
+The game supports English and Spanish but if you want to have a version in your locale language (and you have your system in that language), you can make your own tranlation. Run:
+
+```
+sh include_language_header.sh
+```
+
+That creates a file in "languages" directory which you have to edit. Finally compile 2048.c to apply changes:
+
+```
+gcc -o 2048 2048.c
+./2048
+```
+
 ### Contributing
 
 Contributions are very welcome. Always run the tests before committing using:

@@ -44,6 +44,19 @@ Para el esquema de colores de azul a rojo (requiere 256 colores):
 ./2048 bluered
 ```
 
+#### Internacionalización
+El juego soporta inglés y español pero si quieres tener una versión en tu lenguaje local (y tienes tu sistema en ese lenguaje), puedes hacer tu propia traducción. Corre:
+
+```
+sh include_language_header.sh
+```
+Eso crea un archivo en el directorio "languages" el cual tienes que editar. Finalmente compila 2048.c para aplicar los cambios:
+
+```
+gcc -o 2048 2048.c
+./2048
+```
+
 ### Contribuciones
 
 Las contribuciones son siempre bienvenidas. Siempre correr los tests antes de commitear usando:

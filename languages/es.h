@@ -1,0 +1,1 @@
+const char * LOCALE_WORDS[] = {"o","TERMINADO","FIN DEL JUEGO","¿SALIR?","¿REINICIAR?"};
