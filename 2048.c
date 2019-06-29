@@ -417,7 +417,6 @@ int main(int argc, char *argv[]) {
 			printf("        QUIT? (y/n)         \n");
 			c=getchar();
 			if (c=='y') {
-				printf("\e[1;1H\e[2J");
 				break;
 			}
 			drawBoard(board);
