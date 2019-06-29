@@ -380,8 +380,8 @@ int main(int argc, char *argv[]) {
 	setBufferedInput(false);
 	while (true) {
 		c=getchar();
-		if (c == -1){ //TODO: maybe replace this -1 with a pre-defined constant(if it's in one of header files)
-		    	puts("\nError! Cannot read keyboard input!");
+		if (c == -1){
+			puts("\nError! Cannot read keyboard input!");
 			break;
 		}
 		switch(c) {
