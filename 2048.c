@@ -19,6 +19,7 @@
 
 #define SIZE 4
 uint32_t score=0;
+uint32_t highScore=0;
 uint8_t scheme=0;
 
 void getColor(uint8_t value, char *color, size_t length) {
@@ -37,12 +38,36 @@ void getColor(uint8_t value, char *color, size_t length) {
 	snprintf(color,length,"\033[38;5;%d;48;5;%dm",*foreground,*background);
 }
 
+void readHighScore() {
+	FILE *f = fopen("/usr/local/bin/.2048-score", "r");
+	if (f == NULL)
+	{
+		printf("Error reading high score\n");
+		exit(1);
+	}
+	fscanf(f, "%d,", &highScore);
+	fclose(f);
+}
+
+void saveHighScore() {
+	FILE *f = fopen("/usr/local/bin/.2048-score", "w");
+	if (f == NULL)
+	{
+		printf("Error saving high score\n");
+		exit(1);
+	}
+	fprintf(f, "%i", highScore);
+	fclose(f);
+}
+
 void drawBoard(uint8_t board[SIZE][SIZE]) {
 	uint8_t x,y;
 	char color[40], reset[] = "\033[m";
 	printf("\033[H");
 
-	printf("2048.c %17d pts\n\n",score);
+	// Max points possible: 3,932,156 (7 chars).
+	printf("2048.c %17d pts\n",score);
+	printf("High score: %12d pts\n\n",highScore);
 
 	for (y=0;y<SIZE;y++) {
 		for (x=0;x<SIZE;x++) {
@@ -150,6 +175,9 @@ bool moveUp(uint8_t board[SIZE][SIZE]) {
 	uint8_t x;
 	for (x=0;x<SIZE;x++) {
 		success |= slideArray(board[x]);
+	}
+	if (score>highScore) {
+		highScore = score;
 	}
 	return success;
 }
@@ -360,6 +388,7 @@ int main(int argc, char *argv[]) {
 	uint8_t board[SIZE][SIZE];
 	char c;
 	bool success;
+	readHighScore();
 
 	if (argc == 2 && strcmp(argv[1],"test")==0) {
 		return test();
@@ -430,6 +459,7 @@ int main(int argc, char *argv[]) {
 			drawBoard(board);
 		}
 	}
+	saveHighScore();
 	setBufferedInput(true);
 
 	printf("\033[?25h\033[m");
