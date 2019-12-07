@@ -1,10 +1,10 @@
 # 2048.c
 
-[English](README.md)
-
-![screenshot](screenshot.png)
+[English](README.md
 
 Version de consola del juego "2048" pra GNU/Linux
+
+![screenshot](screenshot.gif)
 
 ## Cómo se juega
 
@@ -19,15 +19,16 @@ Testeado en: GNU/Linux, FreeBSD, OpenBSD
 ## Instalación
 
 ```console
-$ wget https://raw.githubusercontent.com/mevdschee/2048.c/master/2048.c && cd 2048.c && make -B && cd .. && rm -r 2048.c
+git clone https://github.com/mevdschee/2048.c && cd 2048.c && make -B && make install && cd .. && rm -rf 2048.c
 ```
 
 ```console
-$ wget https://raw.githubusercontent.com/mevdschee/2048.c/master/2048.c
-$ cd 2048.c
-$ make -B
-$ cd ..
-$ rm -r 2048.c
+git clone https://github.com/mevdschee/2048.c
+cd 2048.c
+make -B
+make install
+cd ..
+rm -r 2048.c
 ```
 
 ## Correr el juego
@@ -35,19 +36,19 @@ $ rm -r 2048.c
 El juego soporta diferentes esquemas de colores. Esto depende del soporte ANSI para 88 o 256 colores. Si no hay los suficientes colores soportados, el juego irá del blanco al negro (mucho más apto para jugar). Para el esquema de colores original, pone en consola:
 
 ```console
-$ 2048
+2048
 ```
 
 Para el esquema de colores de blanco a negro (requiere 256 colores):
 
 ```console
-$ 2048 blackwhite
+2048 blackwhite
 ```
 
 Para el esquema de colores de azul a rojo (requiere 256 colores):
 
 ```console
-$ 2048 bluered
+2048 bluered
 ```
 
 ## Contribuciones

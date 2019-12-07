@@ -10,3 +10,7 @@
 
 # Executables
 2048
+
+# Mac files
+.DS_Store
+
