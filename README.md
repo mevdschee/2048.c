@@ -1,6 +1,8 @@
 2048.c
 ======
 
+[![run on repl.it](http://repl.it/badge/github/mevdschee/2048.c)](https://repl.it/github/mevdschee/2048.c)
+
 [Spanish](README_es.md)
 
 ![screenshot](screenshot.png)
