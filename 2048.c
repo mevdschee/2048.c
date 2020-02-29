@@ -20,6 +20,7 @@
 #define SIZE 4
 uint32_t score=0;
 uint32_t highScore=0;
+bool showHighScore=false;
 uint8_t scheme=0;
 
 void getColor(uint8_t value, char *color, size_t length) {
@@ -39,24 +40,24 @@ void getColor(uint8_t value, char *color, size_t length) {
 }
 
 void readHighScore() {
-	FILE *f = fopen("/usr/local/bin/.2048-score", "r");
-	if (f == NULL)
-	{
-		printf("Error reading high score\n");
-		exit(1);
+	FILE *f = fopen(".2048-score","r");
+	if (f==NULL) {
+		printf("No existing high score file found\n");
+	} else {
+		fscanf(f,"%d,",&highScore);
+		fclose(f);
+		showHighScore=true;
 	}
-	fscanf(f, "%d,", &highScore);
-	fclose(f);
 }
 
 void saveHighScore() {
-	FILE *f = fopen("/usr/local/bin/.2048-score", "w");
-	if (f == NULL)
+	FILE *f = fopen(".2048-score","w");
+	if (f==NULL)
 	{
 		printf("Error saving high score\n");
 		exit(1);
 	}
-	fprintf(f, "%i", highScore);
+	fprintf(f,"%i",highScore);
 	fclose(f);
 }
 
@@ -67,7 +68,9 @@ void drawBoard(uint8_t board[SIZE][SIZE]) {
 
 	// Max points possible: 3,932,156 (7 chars).
 	printf("2048.c %17d pts\n",score);
-	printf("High score: %12d pts\n\n",highScore);
+	if (showHighScore) {
+		printf("High score: %12d pts\n\n",highScore);
+	}
 
 	for (y=0;y<SIZE;y++) {
 		for (x=0;x<SIZE;x++) {

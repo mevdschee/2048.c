@@ -21,21 +21,19 @@ Tested on: GNU/Linux, FreeBSD, OpenBSD
 One line copy paste:
 
 ```console
-git clone https://github.com/mevdschee/2048.c && cd 2048.c && make -B && make install && cd .. && rm -rf 2048.c
+git clone https://github.com/mevdschee/2048.c && cd 2048.c && make -B && export PATH=$PATH:$PWD
 ```
 
-Separately:
+Or as separate commands:
 
 ```console
 git clone https://github.com/mevdschee/2048.c
 cd 2048.c
 make -B
-make install
-cd ..
-rm -r 2048.c
+export PATH=$PATH:$PWD
 ```
 
-To update, follow installation steps again. Ignore `*** [install] Error 1` (which comes from not overriding the high score file).
+To update, navigate to the cloned directory and run `git pull`.
 
 ## Running
 

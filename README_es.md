@@ -19,16 +19,14 @@ Testeado en: GNU/Linux, FreeBSD, OpenBSD
 ## Instalación
 
 ```console
-git clone https://github.com/mevdschee/2048.c && cd 2048.c && make -B && make install && cd .. && rm -rf 2048.c
+git clone https://github.com/mevdschee/2048.c && cd 2048.c && make -B && export PATH=$PATH:$PWD
 ```
 
 ```console
 git clone https://github.com/mevdschee/2048.c
 cd 2048.c
 make -B
-make install
-cd ..
-rm -r 2048.c
+export PATH=$PATH:$PWD
 ```
 
 ## Correr el juego

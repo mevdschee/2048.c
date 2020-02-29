@@ -14,3 +14,5 @@
 # Mac files
 .DS_Store
 
+# High score file
+.2048-score
