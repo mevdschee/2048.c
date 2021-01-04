@@ -1,0 +1,10 @@
+[Desktop Entry]
+Name=2048
+Comment=Add values sliding tiles until you reach 2048
+Comment[es]=Alcanza el 2048 deslizando y sumando teselas
+Exec=sh -c '/usr/games/2048;echo;echo PRESS ENTER TO EXIT;read line'
+Icon=2048
+Terminal=true
+Type=Application
+Categories=Game;LogicGame;
+Keywords=2d;math;colour;single-player;
