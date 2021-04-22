@@ -1,0 +1,14 @@
+Source: 2048
+Section: unknown
+Priority: extra
+Maintainer: Limows DigitalDemon <limowski256@gmail.com>
+Build-Depends: debhelper (>= 8.0.0)
+Standards-Version: 3.9.3
+Homepage: https://github.com/mevdschee/2048.c
+#Vcs-Git: git://git.debian.org/collab-maint/2048.git
+#Vcs-Browser: http://git.debian.org/?p=collab-maint/2048.git;a=summary
+
+Package: 2048
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Console version of the game "2048" for GNU/Linux
