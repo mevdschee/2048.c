@@ -58,7 +58,8 @@ void drawBoard(uint8_t board[SIZE][SIZE]) {
 			if (board[x][y]!=0) {
 				char s[8];
 				snprintf(s,8,"%u",(uint32_t)1<<board[x][y]);
-				uint8_t t = 7-strlen(s);
+				uint8_t t;
+				t=7-strlen(s);
 				printf("%*s%s%*s",t-t/2,"",s,t/2,"");
 			} else {
 				printf("   ·   ");
