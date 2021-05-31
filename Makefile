@@ -1,7 +1,16 @@
 CFLAGS += -std=c99
+CC = cc
+UNAME = $(shell uname)
 PREFIX ?= /usr
 
+ifeq "$(UNAME)" "Haiku"
+	CC = gcc-x86
+endif
+
 .PHONY: all clean test
+
+2048:	
+	$(CC) $(CFLAGS) 2048.c -o 2048
 
 all: 2048
 
