@@ -21,7 +21,7 @@
 #include <unistd.h>
 
 #define SIZE 4
-int best_score = 0;
+int highscore = 0;
 int score;
 uint8_t scheme = 0;
 
@@ -54,7 +54,7 @@ void drawBoard(uint8_t board[SIZE][SIZE]) {
   printf("\033[H");
 
   printf("2048.c %17d pts\n", score);
-  printf("best record: %11d pts\n\n", best_score);
+  printf("best record: %11d pts\n\n", highscore);
 
   for (y = 0; y < SIZE; y++) {
     for (x = 0; x < SIZE; x++) {
@@ -363,12 +363,21 @@ void signal_callback_handler(int signum) {
   exit(signum);
 }
 
+void save_config(FILE *config, char *configpath) {
+  if (score > highscore) {
+    // HACK: this is a hack to clear the highscore file
+    fclose(fopen(configpath, "w"));
+    // TODO: add encryption
+    fprintf(config, "%d", score);
+  }
+}
+
 int main(int argc, char *argv[]) {
 
-  FILE *config =
-      fopen(strcat(getpwuid(getuid())->pw_dir, "/.config/2048"), "a+");
+  char *configfile = strcat(getpwuid(getuid())->pw_dir, "/.config/2048");
+  FILE *config = fopen(configfile, "a+");
 
-  score = fscanf(config, "%d", &best_score);
+  fscanf(config, "%d", &highscore);
 
   uint8_t board[SIZE][SIZE];
   char c;
@@ -427,7 +436,7 @@ int main(int argc, char *argv[]) {
       addRandom(board);
       drawBoard(board);
       if (gameEnded(board)) {
-      // TODO: fprintf(config, "%d\n", score);
+        save_config(config, configfile);
         printf("         GAME OVER          \n");
         break;
       }
@@ -436,8 +445,8 @@ int main(int argc, char *argv[]) {
       printf("        QUIT? (y/n)         \n");
       c = getchar();
       if (c == 'y') {
-        // TODO: fprintf(config, "%d\n", score);
-        break;
+        save_config(config, configfile);
+        exit(EXIT_SUCCESS);
       }
       drawBoard(board);
     }
