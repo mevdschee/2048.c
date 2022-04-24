@@ -15,3 +15,6 @@ install:
 
 clean:
 	rm -f 2048
+
+run:
+	./run.sh

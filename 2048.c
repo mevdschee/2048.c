@@ -361,6 +361,7 @@ void signal_callback_handler(int signum) {
   setBufferedInput(true);
   printf("\033[?25h\033[m");
   exit(signum);
+        exit(EXIT_SUCCESS);
 }
 
 void save_config(FILE *config, char *configpath) {
@@ -438,6 +439,7 @@ int main(int argc, char *argv[]) {
       if (gameEnded(board)) {
         save_config(config, configfile);
         printf("         GAME OVER          \n");
+        signal_callback_handler(0);
         break;
       }
     }
@@ -446,7 +448,7 @@ int main(int argc, char *argv[]) {
       c = getchar();
       if (c == 'y') {
         save_config(config, configfile);
-        exit(EXIT_SUCCESS);
+        signal_callback_handler(0);
       }
       drawBoard(board);
     }
