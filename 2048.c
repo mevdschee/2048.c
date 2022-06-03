@@ -361,7 +361,7 @@ void signal_callback_handler(int signum) {
   setBufferedInput(true);
   printf("\033[?25h\033[m");
   exit(signum);
-        exit(EXIT_SUCCESS);
+  exit(EXIT_SUCCESS);
 }
 
 void save_config(FILE *config, char *configpath) {
