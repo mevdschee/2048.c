@@ -10,3 +10,8 @@
 
 # Executables
 2048
+
+
+# LSP
+.ccls-cache/
+.ccls-cache/**
