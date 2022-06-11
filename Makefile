@@ -1,5 +1,4 @@
 CFLAGS += -std=c99
-CC=gcc
 PREFIX ?= /usr
 
 .PHONY: all clean test

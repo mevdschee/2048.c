@@ -1,7 +1,7 @@
 /*
  ============================================================================
  Name        : 2048.c
- Author      : abdellatif dev
+ Author      : Maurits van der Schee
  Description : Console version of the game "2048" for GNU/Linux
  ============================================================================
  */
