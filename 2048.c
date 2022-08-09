@@ -19,6 +19,7 @@
 
 #define SIZE 4
 uint32_t score=0;
+uint32_t prevScore=0;
 uint8_t scheme=0;
 
 void getColor(uint8_t value, char *color, size_t length) {
@@ -119,6 +120,7 @@ bool slideArray(uint8_t array[SIZE]) {
 					// merge (increase power of two)
 					array[t]++;
 					// increase score
+                    prevScore=score;
 					score+=(uint32_t)1<<array[t];
 					// set stop to avoid double merge
 					stop = t+1;
@@ -261,6 +263,28 @@ void initBoard(uint8_t board[SIZE][SIZE]) {
 	addRandom(board);
 	drawBoard(board);
 	score = 0;
+    prevScore = 0;
+}
+
+
+void copyBoard(uint8_t srcBoard[SIZE][SIZE], uint8_t dstBoard[SIZE][SIZE]) {
+	uint8_t x,y;
+	for (x=0;x<SIZE;x++) {
+		for (y=0;y<SIZE;y++) {
+			dstBoard[x][y]=srcBoard[x][y];
+		}
+	}
+}
+
+bool areBoardsTheSame(uint8_t srcBoard[SIZE][SIZE], uint8_t dstBoard[SIZE][SIZE]) {
+	uint8_t x,y;
+	for (x=0;x<SIZE;x++) {
+		for (y=0;y<SIZE;y++) {
+			if (dstBoard[x][y] != srcBoard[x][y])
+				return false;
+		}
+	}
+	return true;
 }
 
 void setBufferedInput(bool enable) {
@@ -358,8 +382,11 @@ void signal_callback_handler(int signum) {
 
 int main(int argc, char *argv[]) {
 	uint8_t board[SIZE][SIZE];
+	uint8_t prevBoard[SIZE][SIZE];
+	uint8_t boardMinusTwo[SIZE][SIZE];
 	char c;
 	bool success;
+	bool wereBoardsTheSame;
 
 	if (argc == 2 && strcmp(argv[1],"test")==0) {
 		return test();
@@ -377,6 +404,8 @@ int main(int argc, char *argv[]) {
 	signal(SIGINT, signal_callback_handler);
 
 	initBoard(board);
+	copyBoard(board, prevBoard);
+	copyBoard(board, boardMinusTwo);
 	setBufferedInput(false);
 	while (true) {
 		c=getchar();
@@ -388,20 +417,40 @@ int main(int argc, char *argv[]) {
 			case 97:	// 'a' key
 			case 104:	// 'h' key
 			case 68:	// left arrow
-				success = moveLeft(board);  break;
+				copyBoard(board, boardMinusTwo);
+				success = moveLeft(board);
+				if (!(wereBoardsTheSame = areBoardsTheSame(board, boardMinusTwo))) {
+					copyBoard(boardMinusTwo, prevBoard);
+				}
+				break;
 			case 100:	// 'd' key
 			case 108:	// 'l' key
 			case 67:	// right arrow
-				success = moveRight(board); break;
+				copyBoard(board, boardMinusTwo);
+				success = moveRight(board);
+				if (!(wereBoardsTheSame = areBoardsTheSame(board, boardMinusTwo))) {
+					copyBoard(boardMinusTwo, prevBoard);
+				}
+				break;
 			case 119:	// 'w' key
 			case 107:	// 'k' key
 			case 65:	// up arrow
-				success = moveUp(board);    break;
+				copyBoard(board, boardMinusTwo);
+				success = moveUp(board);
+				if (!(wereBoardsTheSame = areBoardsTheSame(board, boardMinusTwo))) {
+					copyBoard(boardMinusTwo, prevBoard);
+				}
+				break;
 			case 115:	// 's' key
 			case 106:	// 'j' key
 			case 66:	// down arrow
-				success = moveDown(board);  break;
-			default: success = false;
+				copyBoard(board, boardMinusTwo);
+				success = moveDown(board);
+				if (!(wereBoardsTheSame = areBoardsTheSame(board, boardMinusTwo))) {
+					copyBoard(boardMinusTwo, prevBoard);
+				}
+				break;
+		    default: success = false;
 		}
 		if (success) {
 			drawBoard(board);
@@ -412,6 +461,11 @@ int main(int argc, char *argv[]) {
 				printf("         GAME OVER          \n");
 				break;
 			}
+		}
+		if (c=='u') {
+			copyBoard(prevBoard, board);
+			score = prevScore;
+			drawBoard(board);
 		}
 		if (c=='q') {
 			printf("        QUIT? (y/n)         \n");
