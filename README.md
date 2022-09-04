@@ -21,7 +21,7 @@ Tested on: GNU/Linux, FreeBSD, OpenBSD
 
 ```
 wget https://raw.githubusercontent.com/mevdschee/2048.c/master/2048.c
-gcc -o 2048 2048.c
+cc -o 2048 2048.c
 ./2048
 ```
 
