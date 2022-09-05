@@ -27,8 +27,8 @@ void getColors(uint8_t value, uint8_t *foreground, uint8_t *background)
 	uint8_t blackwhite[] = {232, 255, 234, 255, 236, 255, 238, 255, 240, 255, 242, 255, 244, 255, 246, 0, 248, 0, 249, 0, 250, 0, 251, 0, 252, 0, 253, 0, 254, 0, 255, 0};
 	uint8_t bluered[] = {235, 255, 63, 255, 57, 255, 93, 255, 129, 255, 165, 255, 201, 255, 200, 255, 199, 255, 198, 255, 197, 255, 196, 255, 196, 255, 196, 255, 196, 255, 196, 255};
 	uint8_t *schemes[] = {original, blackwhite, bluered};
-	*foreground = *(schemes[scheme] + 1 + value * 2);
-	*background = *(schemes[scheme] + 0 + value * 2);
+	*foreground = *(schemes[scheme] + (1 + value * 2) % sizeof(original));
+	*background = *(schemes[scheme] + (0 + value * 2) % sizeof(original));
 }
 
 uint8_t getNumberLength(uint32_t number)
