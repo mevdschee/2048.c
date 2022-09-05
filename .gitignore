@@ -10,3 +10,7 @@
 
 # Executables
 2048
+
+# IDE
+.idea/
+.vscode/
