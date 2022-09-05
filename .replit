@@ -1,2 +1,0 @@
-language = "bash"
-run = "gcc ./2048.c -o 2048 && chmod +x 2048 && ./2048"
