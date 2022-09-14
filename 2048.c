@@ -21,6 +21,16 @@
 uint32_t score = 0;
 uint8_t scheme = 0;
 
+enum gameStates
+{
+	inGame,
+	gameOver,
+	wantQuit,
+	restartGame
+};
+
+enum gameStates state;
+
 void getColors(uint8_t value, uint8_t *foreground, uint8_t *background)
 {
 	uint8_t original[] = {8, 255, 1, 255, 2, 255, 3, 255, 4, 255, 5, 255, 6, 255, 7, 255, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 255, 0, 255, 0};
@@ -83,9 +93,45 @@ void drawBoard(uint8_t board[SIZE][SIZE])
 		}
 		printf("\n");
 	}
-	printf("\n");
-	printf("        ←,↑,→,↓ or q        \n");
-	printf("\033[A"); // one line up
+	switch(state)
+	{
+		case inGame:
+		{
+			printf("____________________________\n");
+			printf("|               |          |\n");
+			printf("|←,↑,→,↓ - move | / - undo |\n");
+			printf("|r - restart    | q - exit |\n");
+			printf("________________|___________\n");
+			break;
+		}
+		case gameOver:
+		{
+			printf("____________________________\n");
+			printf("|                          |\n");
+			printf("|        GAME OVER         |\n");
+			printf("| / - undo move | q - exit |\n");
+			printf("____________________________\n");
+			break;
+		}
+		case wantQuit:
+		{
+			printf("____________________________\n");
+			printf("|                          |\n");
+			printf("|       QUIT? (y/n)        |\n");
+			printf("|                          |\n");
+			printf("____________________________\n");
+			break;
+		}
+		case restartGame:
+		{
+			printf("____________________________\n");
+			printf("|                          |\n");
+			printf("|      RESTART? (y/n)      |\n");
+			printf("|                          |\n");
+			printf("____________________________\n");
+			break;
+		}
+	}
 }
 
 uint8_t findTarget(uint8_t array[SIZE], uint8_t x, uint8_t stop)
@@ -482,6 +528,7 @@ int main(int argc, char *argv[])
 	// register signal handler for when ctrl-c is pressed
 	signal(SIGINT, signal_callback_handler);
 
+	state = inGame;
 	initBoard(board);
 	copyBoard(board, previousBoard);
 	copyBoard(board, bufferBoard);
@@ -543,28 +590,48 @@ int main(int argc, char *argv[])
 			drawBoard(board);
 			if (gameEnded(board))
 			{
-				printf("         GAME OVER          \n");
-				break;
+				state = gameOver;
+				drawBoard(board);
+				while (true)
+				{
+					c = getchar();
+					if (c == 'q')
+					{
+						break;
+					}
+					else if(c == '/')
+					{
+						state = inGame;
+						undoMove(board, previousBoard);
+						drawBoard(board);
+						break;
+					}
+				}
 			}
 		}
 		if (c == 'q')
 		{
-			printf("        QUIT? (y/n)         \n");
+			state = wantQuit;
+			drawBoard(board);
 			c = getchar();
 			if (c == 'y')
 			{
 				break;
 			}
+			state = inGame;
 			drawBoard(board);
 		}
 		if (c == 'r')
 		{
-			printf("       RESTART? (y/n)       \n");
+			state = restartGame;
+			drawBoard(board);
 			c = getchar();
 			if (c == 'y')
 			{
+				state = inGame;
 				initBoard(board);
 			}
+			state = inGame;
 			drawBoard(board);
 		}
 	}
