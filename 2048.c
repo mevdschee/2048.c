@@ -216,6 +216,38 @@ bool moveRight(uint8_t board[SIZE][SIZE])
 	return success;
 }
 
+void copyBoard(uint8_t boardToCopy[SIZE][SIZE], uint8_t boardToGetCopy[SIZE][SIZE])
+{
+	uint8_t x, y;
+	for (x = 0; x < SIZE; x++)
+	{
+		for (y = 0; y < SIZE; y++)
+		{
+			boardToGetCopy[x][y] = boardToCopy[x][y];
+		}
+	}
+}
+
+bool boardsAreSimilar(uint8_t boardOne[SIZE][SIZE], uint8_t boardTwo[SIZE][SIZE])
+{
+	bool similar = true;
+	uint8_t x, y;
+	for (x = 0; x < SIZE; x++)
+	{
+		for (y = 0; y < SIZE; y++)
+		{
+			if(boardOne[x][y] != boardTwo[x][y])
+				return false;
+		}
+	}
+	return similar;
+}
+
+void undoMove(uint8_t board[SIZE][SIZE], uint8_t previousBoard[SIZE][SIZE])
+{
+	copyBoard(previousBoard, board);
+}
+
 bool findPairDown(uint8_t board[SIZE][SIZE])
 {
 	bool success = false;
@@ -427,6 +459,8 @@ void signal_callback_handler(int signum)
 int main(int argc, char *argv[])
 {
 	uint8_t board[SIZE][SIZE];
+	uint8_t previousBoard[SIZE][SIZE];
+	uint8_t bufferBoard[SIZE][SIZE];
 	char c;
 	bool success;
 
@@ -449,6 +483,9 @@ int main(int argc, char *argv[])
 	signal(SIGINT, signal_callback_handler);
 
 	initBoard(board);
+	copyBoard(board, previousBoard);
+	copyBoard(board, bufferBoard);
+
 	setBufferedInput(false);
 	while (true)
 	{
@@ -463,23 +500,38 @@ int main(int argc, char *argv[])
 		case 97:  // 'a' key
 		case 104: // 'h' key
 		case 68:  // left arrow
+			copyBoard(board, bufferBoard);
 			success = moveLeft(board);
+			if(!boardsAreSimilar(board, bufferBoard))
+				copyBoard(bufferBoard, previousBoard);
 			break;
 		case 100: // 'd' key
 		case 108: // 'l' key
 		case 67:  // right arrow
+			copyBoard(board, bufferBoard);
 			success = moveRight(board);
+			if(!boardsAreSimilar(board, bufferBoard))
+				copyBoard(bufferBoard, previousBoard);
 			break;
 		case 119: // 'w' key
 		case 107: // 'k' key
 		case 65:  // up arrow
+			copyBoard(board, bufferBoard);
 			success = moveUp(board);
+			if(!boardsAreSimilar(board, bufferBoard))
+				copyBoard(bufferBoard, previousBoard);
 			break;
 		case 115: // 's' key
 		case 106: // 'j' key
 		case 66:  // down arrow
+			copyBoard(board, bufferBoard);
 			success = moveDown(board);
+			if(!boardsAreSimilar(board, bufferBoard))
+				copyBoard(bufferBoard, previousBoard);
 			break;
+		case 47: // "/"key
+			undoMove(board, previousBoard);
+			drawBoard(board);
 		default:
 			success = false;
 		}
