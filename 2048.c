@@ -19,6 +19,7 @@
 
 #define SIZE 4
 uint32_t score = 0;
+uint32_t moveNumber = 0;
 uint8_t scheme = 0;
 
 enum gameStates
@@ -56,7 +57,7 @@ void drawBoard(uint8_t board[SIZE][SIZE])
 {
 	uint8_t x, y, fg, bg;
 	printf("\033[H");
-	printf("2048.c %17d pts\n\n", score);
+	printf("Move: %d | Score: %d pts\n\n",moveNumber, score);
 	for (y = 0; y < SIZE; y++)
 	{
 		for (x = 0; x < SIZE; x++)
@@ -292,6 +293,10 @@ bool boardsAreSimilar(uint8_t boardOne[SIZE][SIZE], uint8_t boardTwo[SIZE][SIZE]
 void undoMove(uint8_t board[SIZE][SIZE], uint8_t previousBoard[SIZE][SIZE])
 {
 	copyBoard(previousBoard, board);
+	if(moveNumber != 0)
+	{
+		moveNumber--;
+	}
 }
 
 bool findPairDown(uint8_t board[SIZE][SIZE])
@@ -392,6 +397,7 @@ void initBoard(uint8_t board[SIZE][SIZE])
 	addRandom(board);
 	drawBoard(board);
 	score = 0;
+	moveNumber = 0;
 }
 
 void setBufferedInput(bool enable)
@@ -506,7 +512,9 @@ int main(int argc, char *argv[])
 {
 	uint8_t board[SIZE][SIZE];
 	uint8_t previousBoard[SIZE][SIZE];
+	// uint8_t*** previousBoardList = (uint8_t***)malloc(SIZE * SIZE * sizeof(uint8_t***));
 	uint8_t bufferBoard[SIZE][SIZE];
+
 	char c;
 	bool success;
 
@@ -530,6 +538,9 @@ int main(int argc, char *argv[])
 
 	state = inGame;
 	initBoard(board);
+
+	uint8_t i;
+
 	copyBoard(board, previousBoard);
 	copyBoard(board, bufferBoard);
 
@@ -550,7 +561,10 @@ int main(int argc, char *argv[])
 			copyBoard(board, bufferBoard);
 			success = moveLeft(board);
 			if(!boardsAreSimilar(board, bufferBoard))
+			{
 				copyBoard(bufferBoard, previousBoard);
+				moveNumber++;
+			}
 			break;
 		case 100: // 'd' key
 		case 108: // 'l' key
@@ -558,7 +572,10 @@ int main(int argc, char *argv[])
 			copyBoard(board, bufferBoard);
 			success = moveRight(board);
 			if(!boardsAreSimilar(board, bufferBoard))
+			{
 				copyBoard(bufferBoard, previousBoard);
+				moveNumber++;
+			}
 			break;
 		case 119: // 'w' key
 		case 107: // 'k' key
@@ -566,7 +583,10 @@ int main(int argc, char *argv[])
 			copyBoard(board, bufferBoard);
 			success = moveUp(board);
 			if(!boardsAreSimilar(board, bufferBoard))
+			{
 				copyBoard(bufferBoard, previousBoard);
+				moveNumber++;
+			}
 			break;
 		case 115: // 's' key
 		case 106: // 'j' key
@@ -574,7 +594,10 @@ int main(int argc, char *argv[])
 			copyBoard(board, bufferBoard);
 			success = moveDown(board);
 			if(!boardsAreSimilar(board, bufferBoard))
+			{
 				copyBoard(bufferBoard, previousBoard);
+				moveNumber++;
+			}
 			break;
 		case 47: // "/"key
 			undoMove(board, previousBoard);
