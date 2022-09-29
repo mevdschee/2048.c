@@ -32,6 +32,13 @@ enum gameStates
 
 enum gameStates state;
 
+typedef struct stack_node
+{
+	uint8_t board[SIZE][SIZE];
+	uint32_t score;
+	struct stack_node* next;
+} stack_node;
+
 void getColors(uint8_t value, uint8_t *foreground, uint8_t *background)
 {
 	uint8_t original[] = {8, 255, 1, 255, 2, 255, 3, 255, 4, 255, 5, 255, 6, 255, 7, 255, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 255, 0, 255, 0};
@@ -290,13 +297,25 @@ bool boardsAreSimilar(uint8_t boardOne[SIZE][SIZE], uint8_t boardTwo[SIZE][SIZE]
 	return similar;
 }
 
-void undoMove(uint8_t board[SIZE][SIZE], uint8_t previousBoard[SIZE][SIZE])
+void undoMove(uint8_t board[SIZE][SIZE], stack_node** historyHead)
 {
-	copyBoard(previousBoard, board);
+	stack_node* topNode = *historyHead;
+	uint8_t (*previousBoard)[SIZE][SIZE] = &(topNode->board);
+	if(boardsAreSimilar(board, *previousBoard))
+	{
+		return;
+	}
+
+	copyBoard(*previousBoard, board);
+	score = topNode->score;
+
 	if(moveNumber != 0)
 	{
 		moveNumber--;
 	}
+
+	*historyHead = topNode->next;
+	free(topNode);
 }
 
 bool findPairDown(uint8_t board[SIZE][SIZE])
@@ -511,9 +530,9 @@ void signal_callback_handler(int signum)
 int main(int argc, char *argv[])
 {
 	uint8_t board[SIZE][SIZE];
-	uint8_t previousBoard[SIZE][SIZE];
-	// uint8_t*** previousBoardList = (uint8_t***)malloc(SIZE * SIZE * sizeof(uint8_t***));
 	uint8_t bufferBoard[SIZE][SIZE];
+	struct stack_node* historyHead = (struct stack_node*)malloc(sizeof(struct stack_node));
+	uint32_t bufferScore;
 
 	char c;
 	bool success;
@@ -538,15 +557,17 @@ int main(int argc, char *argv[])
 
 	state = inGame;
 	initBoard(board);
+	historyHead->score = score;
 
 	uint8_t i;
 
-	copyBoard(board, previousBoard);
+	copyBoard(board, historyHead->board);
 	copyBoard(board, bufferBoard);
 
 	setBufferedInput(false);
 	while (true)
 	{
+		bufferScore = score;
 		c = getchar();
 		if (c == -1)
 		{
@@ -560,53 +581,41 @@ int main(int argc, char *argv[])
 		case 68:  // left arrow
 			copyBoard(board, bufferBoard);
 			success = moveLeft(board);
-			if(!boardsAreSimilar(board, bufferBoard))
-			{
-				copyBoard(bufferBoard, previousBoard);
-				moveNumber++;
-			}
 			break;
 		case 100: // 'd' key
 		case 108: // 'l' key
 		case 67:  // right arrow
 			copyBoard(board, bufferBoard);
 			success = moveRight(board);
-			if(!boardsAreSimilar(board, bufferBoard))
-			{
-				copyBoard(bufferBoard, previousBoard);
-				moveNumber++;
-			}
 			break;
 		case 119: // 'w' key
 		case 107: // 'k' key
 		case 65:  // up arrow
 			copyBoard(board, bufferBoard);
 			success = moveUp(board);
-			if(!boardsAreSimilar(board, bufferBoard))
-			{
-				copyBoard(bufferBoard, previousBoard);
-				moveNumber++;
-			}
 			break;
 		case 115: // 's' key
 		case 106: // 'j' key
 		case 66:  // down arrow
 			copyBoard(board, bufferBoard);
 			success = moveDown(board);
-			if(!boardsAreSimilar(board, bufferBoard))
-			{
-				copyBoard(bufferBoard, previousBoard);
-				moveNumber++;
-			}
 			break;
 		case 47: // "/"key
-			undoMove(board, previousBoard);
+			undoMove(board, &historyHead);
 			drawBoard(board);
 		default:
 			success = false;
 		}
 		if (success)
 		{
+			stack_node* newHistoryHead = (stack_node*)malloc(sizeof(stack_node));
+			copyBoard(bufferBoard, newHistoryHead->board);
+			newHistoryHead->score = bufferScore;
+			newHistoryHead->next = historyHead;
+			historyHead = newHistoryHead;
+			
+			moveNumber++;
+
 			drawBoard(board);
 			usleep(150000);
 			addRandom(board);
@@ -625,7 +634,7 @@ int main(int argc, char *argv[])
 					else if(c == '/')
 					{
 						state = inGame;
-						undoMove(board, previousBoard);
+						undoMove(board, &historyHead);
 						drawBoard(board);
 						break;
 					}
@@ -653,6 +662,16 @@ int main(int argc, char *argv[])
 			{
 				state = inGame;
 				initBoard(board);
+
+				while (historyHead->next != NULL)
+				{
+					stack_node* currentTop = historyHead;
+					historyHead = historyHead->next;
+					free(currentTop);
+				}
+				historyHead->score = score;
+				copyBoard(board, bufferBoard);
+				copyBoard(board, historyHead->board);
 			}
 			state = inGame;
 			drawBoard(board);
