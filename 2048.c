@@ -374,7 +374,6 @@ int test()
 			if (array[i] != out[i])
 				success = false;
 
-
 		if (success == false)
 		{
 			for (i = 0; i < SIZE; i++)
@@ -422,15 +421,17 @@ int main(int argc, char *argv[])
 	char c;
 	bool success;
 
-	if (argc == 2 && strcmp(argv[1], "test") == 0)
-		return test();
+	if (argc == 2)
+	{
+		if (strcmp(argv[1], "test") == 0)
+			return test();
 
-	if (argc == 2 && strcmp(argv[1], "blackwhite") == 0)
-		scheme = 1;
+		if (strcmp(argv[1], "blackwhite") == 0)
+			scheme = 1;
 
-	if (argc == 2 && strcmp(argv[1], "bluered") == 0)
-		scheme = 2;
-
+		if (strcmp(argv[1], "bluered") == 0)
+			scheme = 2;
+	}
 
 	printf("\033[?25l\033[2J");
 
