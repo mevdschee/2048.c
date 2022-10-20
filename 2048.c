@@ -338,12 +338,6 @@ void setBufferedInput(const bool enable)
 	}
 }
 
-/** calculates how many values an array has */
-unsigned long len(const a[])
-{
-	return sizeof(a) / sizeof(a[0]);
-}
-
 int test()
 {
 	uint8_t array[SIZE];
