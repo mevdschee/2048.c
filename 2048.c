@@ -188,13 +188,13 @@ void rotateBoard(uint8_t board[SIZE][SIZE])
 }
 
 /** call `rotateBoard` N times */
-void rotateBoardN(const uint8_t board[SIZE][SIZE], uint8_t n)
+void rotateBoardN(uint8_t board[SIZE][SIZE], uint8_t n)
 {
 	while (n--)
 		rotateBoard(board);
 }
 
-bool moveUp(const uint8_t board[SIZE][SIZE])
+bool moveUp(uint8_t board[SIZE][SIZE])
 {
 	bool success = false;
 	for (uint8_t x = 0; x < SIZE; x++)
@@ -203,7 +203,7 @@ bool moveUp(const uint8_t board[SIZE][SIZE])
 	return success;
 }
 
-bool moveLeft(const uint8_t board[SIZE][SIZE])
+bool moveLeft(uint8_t board[SIZE][SIZE])
 {
 	rotateBoard(board);
 	const bool success = moveUp(board);
@@ -211,7 +211,7 @@ bool moveLeft(const uint8_t board[SIZE][SIZE])
 	return success;
 }
 
-bool moveDown(const uint8_t board[SIZE][SIZE])
+bool moveDown(uint8_t board[SIZE][SIZE])
 {
 	rotateBoardN(board, 2);
 	const bool success = moveUp(board);
@@ -219,7 +219,7 @@ bool moveDown(const uint8_t board[SIZE][SIZE])
 	return success;
 }
 
-bool moveRight(const uint8_t board[SIZE][SIZE])
+bool moveRight(uint8_t board[SIZE][SIZE])
 {
 	rotateBoardN(board, 3);
 	const bool success = moveUp(board);
@@ -342,7 +342,7 @@ int test()
 {
 	uint8_t array[SIZE];
 	/** these are exponents with base 2 (1->2 2->4 3->8) */
-	const uint8_t data[] = {
+	uint8_t data[] = {
 		0, 0, 0, 1, 1, 0, 0, 0,
 		0, 0, 1, 1, 2, 0, 0, 0,
 		0, 1, 0, 1, 2, 0, 0, 0,
