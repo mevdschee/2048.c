@@ -19,30 +19,41 @@
 
 #define SIZE 4
 uint32_t score = 0;
-uint8_t scheme = 0;
 
-void getColors(uint8_t value, uint8_t *foreground, uint8_t *background)
+/**
+ * given a tile `value` and a color-`scheme` index,
+ * returns `foreground` and `background` colors as a "2-tuple".
+*/
+uint8_t *getColors(uint8_t value, uint8_t scheme)
 {
+	static uint8_t out[2] = {0, 0};
 	uint8_t original[] = {8, 255, 1, 255, 2, 255, 3, 255, 4, 255, 5, 255, 6, 255, 7, 255, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 255, 0, 255, 0};
 	uint8_t blackwhite[] = {232, 255, 234, 255, 236, 255, 238, 255, 240, 255, 242, 255, 244, 255, 246, 0, 248, 0, 249, 0, 250, 0, 251, 0, 252, 0, 253, 0, 254, 0, 255, 0};
 	uint8_t bluered[] = {235, 255, 63, 255, 57, 255, 93, 255, 129, 255, 165, 255, 201, 255, 200, 255, 199, 255, 198, 255, 197, 255, 196, 255, 196, 255, 196, 255, 196, 255, 196, 255};
 	uint8_t *schemes[] = {original, blackwhite, bluered};
-	*foreground = *(schemes[scheme] + (1 + value * 2) % sizeof(original));
-	*background = *(schemes[scheme] + (0 + value * 2) % sizeof(original));
+	uint8_t *s = schemes[scheme];
+	value *= 2;
+	unsigned long len = sizeof(original);
+	uint8_t fg = *(s + (1 + value) % len);
+	uint8_t bg = *(s + (0 + value) % len);
+	out[0] = fg;
+	out[1] = bg;
+	return out;
 }
 
-uint8_t getNumberLength(uint32_t number)
+/** calculates `floor(log_10(n) + 1)` */
+uint8_t digitCount(uint32_t n)
 {
-	uint8_t count = 0;
+	uint8_t c = 0;
 	do
 	{
-		number /= 10;
-		count += 1;
-	} while (number);
-	return count;
+		n /= 10;
+		c += 1;
+	} while (n);
+	return c;
 }
 
-void drawBoard(uint8_t board[SIZE][SIZE])
+void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme)
 {
 	uint8_t x, y, fg, bg;
 	printf("\033[H");
@@ -51,7 +62,9 @@ void drawBoard(uint8_t board[SIZE][SIZE])
 	{
 		for (x = 0; x < SIZE; x++)
 		{
-			getColors(board[x][y], &fg, &bg);
+			uint8_t *colors = getColors(board[x][y], scheme);
+			fg = colors[0];
+			bg = colors[1];
 			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
 			printf("       ");
 			printf("\033[m"); // reset
@@ -59,12 +72,14 @@ void drawBoard(uint8_t board[SIZE][SIZE])
 		printf("\n");
 		for (x = 0; x < SIZE; x++)
 		{
-			getColors(board[x][y], &fg, &bg);
+			uint8_t *colors = getColors(board[x][y], scheme);
+			fg = colors[0];
+			bg = colors[1];
 			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
 			if (board[x][y] != 0)
 			{
 				uint32_t number = 1 << board[x][y];
-				uint8_t t = 7 - getNumberLength(number);
+				uint8_t t = 7 - digitCount(number);
 				printf("%*s%u%*s", t - t / 2, "", number, t / 2, "");
 			}
 			else
@@ -76,7 +91,9 @@ void drawBoard(uint8_t board[SIZE][SIZE])
 		printf("\n");
 		for (x = 0; x < SIZE; x++)
 		{
-			getColors(board[x][y], &fg, &bg);
+			uint8_t *colors = getColors(board[x][y], scheme);
+			fg = colors[0];
+			bg = colors[1];
 			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
 			printf("       ");
 			printf("\033[m"); // reset
@@ -300,7 +317,7 @@ void addRandom(uint8_t board[SIZE][SIZE])
 	}
 }
 
-void initBoard(uint8_t board[SIZE][SIZE])
+void initBoard(uint8_t board[SIZE][SIZE], uint8_t scheme)
 {
 	uint8_t x, y;
 	for (x = 0; x < SIZE; x++)
@@ -312,7 +329,7 @@ void initBoard(uint8_t board[SIZE][SIZE])
 	}
 	addRandom(board);
 	addRandom(board);
-	drawBoard(board);
+	drawBoard(board, scheme);
 	score = 0;
 }
 
@@ -426,6 +443,7 @@ void signal_callback_handler(int signum)
 
 int main(int argc, char *argv[])
 {
+	uint8_t scheme = 0;
 	uint8_t board[SIZE][SIZE];
 	char c;
 	bool success;
@@ -448,7 +466,7 @@ int main(int argc, char *argv[])
 	// register signal handler for when ctrl-c is pressed
 	signal(SIGINT, signal_callback_handler);
 
-	initBoard(board);
+	initBoard(board, scheme);
 	setBufferedInput(false);
 	while (true)
 	{
@@ -485,10 +503,10 @@ int main(int argc, char *argv[])
 		}
 		if (success)
 		{
-			drawBoard(board);
+			drawBoard(board, scheme);
 			usleep(150000);
 			addRandom(board);
-			drawBoard(board);
+			drawBoard(board, scheme);
 			if (gameEnded(board))
 			{
 				printf("         GAME OVER          \n");
@@ -503,7 +521,7 @@ int main(int argc, char *argv[])
 			{
 				break;
 			}
-			drawBoard(board);
+			drawBoard(board, scheme);
 		}
 		if (c == 'r')
 		{
@@ -511,9 +529,9 @@ int main(int argc, char *argv[])
 			c = getchar();
 			if (c == 'y')
 			{
-				initBoard(board);
+				initBoard(board, scheme);
 			}
-			drawBoard(board);
+			drawBoard(board, scheme);
 		}
 	}
 	setBufferedInput(true);
