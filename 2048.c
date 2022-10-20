@@ -276,8 +276,7 @@ bool gameEnded(uint8_t board[SIZE][SIZE])
 void addRandom(uint8_t board[SIZE][SIZE])
 {
 	static bool initialized = false;
-	uint8_t x, y;
-	uint8_t r, len = 0;
+	uint8_t x, y, r, len = 0;
 	uint8_t n, list[SIZE * SIZE][2];
 
 	if (!initialized)
@@ -287,21 +286,17 @@ void addRandom(uint8_t board[SIZE][SIZE])
 	}
 
 	for (x = 0; x < SIZE; x++)
-	{
 		for (y = 0; y < SIZE; y++)
-		{
 			if (board[x][y] == 0)
 			{
 				list[len][0] = x;
 				list[len][1] = y;
 				len++;
 			}
-		}
-	}
 
 	if (len > 0)
 	{
-		r = rand() % len;
+		const uint8_t r = rand() % len;
 		x = list[r][0];
 		y = list[r][1];
 		n = (rand() % 10) / 9 + 1;
@@ -309,23 +304,19 @@ void addRandom(uint8_t board[SIZE][SIZE])
 	}
 }
 
-void initBoard(uint8_t board[SIZE][SIZE], uint8_t scheme)
+void initBoard(uint8_t board[SIZE][SIZE], const uint8_t scheme)
 {
-	uint8_t x, y;
-	for (x = 0; x < SIZE; x++)
-	{
-		for (y = 0; y < SIZE; y++)
-		{
+	for (uint8_t x = 0; x < SIZE; x++)
+		for (uint8_t y = 0; y < SIZE; y++)
 			board[x][y] = 0;
-		}
-	}
+
 	addRandom(board);
 	addRandom(board);
 	drawBoard(board, scheme);
 	score = 0;
 }
 
-void setBufferedInput(bool enable)
+void setBufferedInput(const bool enable)
 {
 	static bool enabled = true;
 	static struct termios old;
@@ -353,11 +344,15 @@ void setBufferedInput(bool enable)
 	}
 }
 
+unsigned long len(const a[]){
+	return sizeof(a) / sizeof(a[0]);
+}
+
 int test()
 {
 	uint8_t array[SIZE];
-	// these are exponents with base 2 (1=2 2=4 3=8)
-	uint8_t data[] = {
+	/** these are exponents with base 2 (1->2 2->4 3->8) */
+	const uint8_t data[] = {
 		0, 0, 0, 1, 1, 0, 0, 0,
 		0, 0, 1, 1, 2, 0, 0, 0,
 		0, 1, 0, 1, 2, 0, 0, 0,
@@ -376,7 +371,7 @@ int test()
 	uint8_t i;
 	bool success = true;
 
-	tests = (sizeof(data) / sizeof(data[0])) / (2 * SIZE);
+	tests = len(data) / (2 * SIZE);
 	for (t = 0; t < tests; t++)
 	{
 		in = data + t * 2 * SIZE;
