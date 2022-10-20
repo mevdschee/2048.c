@@ -23,7 +23,7 @@ uint32_t score = 0;
 /**
  * given a tile `value` and a color-`scheme` index,
  * returns `foreground` and `background` colors as a "2-tuple".
-*/
+ */
 __attribute__((pure)) uint8_t *getColors(uint8_t value, const uint8_t scheme)
 {
 	static uint8_t out[2] = {0, 0};
@@ -189,7 +189,8 @@ void rotateBoard(uint8_t board[SIZE][SIZE])
 }
 
 /** call `rotateBoard` N times */
-void rotateBoardN(const uint8_t board[SIZE][SIZE], uint8_t n){
+void rotateBoardN(const uint8_t board[SIZE][SIZE], uint8_t n)
+{
 	while (n--)
 		rotateBoard(board);
 }
@@ -344,7 +345,8 @@ void setBufferedInput(const bool enable)
 	}
 }
 
-unsigned long len(const a[]){
+unsigned long len(const a[])
+{
 	return sizeof(a) / sizeof(a[0]);
 }
 
