@@ -188,53 +188,48 @@ void rotateBoard(uint8_t board[SIZE][SIZE])
 	}
 }
 
-bool moveUp(uint8_t board[SIZE][SIZE])
+/** call `rotateBoard` N times */
+void rotateBoardN(const uint8_t board[SIZE][SIZE], uint8_t n){
+	while (n--)
+		rotateBoard(board);
+}
+
+bool moveUp(const uint8_t board[SIZE][SIZE])
 {
 	bool success = false;
-	uint8_t x;
-	for (x = 0; x < SIZE; x++)
-	{
+	for (uint8_t x = 0; x < SIZE; x++)
 		success |= slideArray(board[x]);
-	}
+
 	return success;
 }
 
-bool moveLeft(uint8_t board[SIZE][SIZE])
+bool moveLeft(const uint8_t board[SIZE][SIZE])
 {
-	bool success;
 	rotateBoard(board);
-	success = moveUp(board);
-	rotateBoard(board);
-	rotateBoard(board);
-	rotateBoard(board);
+	const bool success = moveUp(board);
+	rotateBoardN(board, 3);
 	return success;
 }
 
-bool moveDown(uint8_t board[SIZE][SIZE])
+bool moveDown(const uint8_t board[SIZE][SIZE])
 {
-	bool success;
-	rotateBoard(board);
-	rotateBoard(board);
-	success = moveUp(board);
-	rotateBoard(board);
-	rotateBoard(board);
+	rotateBoardN(board, 2);
+	const bool success = moveUp(board);
+	rotateBoardN(board, 2);
 	return success;
 }
 
-bool moveRight(uint8_t board[SIZE][SIZE])
+bool moveRight(const uint8_t board[SIZE][SIZE])
 {
-	bool success;
-	rotateBoard(board);
-	rotateBoard(board);
-	rotateBoard(board);
-	success = moveUp(board);
+	rotateBoardN(board, 3);
+	const bool success = moveUp(board);
 	rotateBoard(board);
 	return success;
 }
 
-bool findPairDown(uint8_t board[SIZE][SIZE])
+/** returns `bool success` */
+bool findPairDown(const uint8_t board[SIZE][SIZE])
 {
-	bool success = false;
 	uint8_t x, y;
 	for (x = 0; x < SIZE; x++)
 	{
@@ -244,7 +239,7 @@ bool findPairDown(uint8_t board[SIZE][SIZE])
 				return true;
 		}
 	}
-	return success;
+	return false;
 }
 
 uint8_t countEmpty(uint8_t board[SIZE][SIZE])
@@ -274,9 +269,7 @@ bool gameEnded(uint8_t board[SIZE][SIZE])
 	rotateBoard(board);
 	if (findPairDown(board))
 		ended = false;
-	rotateBoard(board);
-	rotateBoard(board);
-	rotateBoard(board);
+	rotateBoardN(board, 3);
 	return ended;
 }
 
