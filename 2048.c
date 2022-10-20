@@ -24,7 +24,7 @@ uint32_t score = 0;
  * given a tile `value` and a color-`scheme` index,
  * returns `foreground` and `background` colors as a "2-tuple".
 */
-uint8_t *getColors(uint8_t value, uint8_t scheme)
+__attribute__((pure)) uint8_t *getColors(uint8_t value, const uint8_t scheme)
 {
 	static uint8_t out[2] = {0, 0};
 	uint8_t original[] = {8, 255, 1, 255, 2, 255, 3, 255, 4, 255, 5, 255, 6, 255, 7, 255, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 255, 0, 255, 0};
