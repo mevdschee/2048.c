@@ -105,15 +105,14 @@ void drawBoard(const uint8_t board[SIZE][SIZE], const uint8_t scheme)
 	printf("\033[A"); // one line up
 }
 
-uint8_t findTarget(uint8_t array[SIZE], uint8_t x, uint8_t stop)
+uint8_t findTarget(const uint8_t array[SIZE], const uint8_t x, const uint8_t stop)
 {
-	uint8_t t;
 	// if the position is already on the first, don't evaluate
 	if (x == 0)
 	{
 		return x;
 	}
-	for (t = x - 1;; t--)
+	for (uint8_t t = x - 1;; t--)
 	{
 		if (array[t] != 0)
 		{
