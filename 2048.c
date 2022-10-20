@@ -18,6 +18,7 @@
 #include <signal.h>
 
 #define SIZE 4
+#define SEQ "\033[?25h\033[m"
 uint32_t score = 0;
 
 /**
@@ -41,8 +42,16 @@ __attribute__((pure)) uint8_t *getColors(uint8_t value, const uint8_t scheme)
 	return out;
 }
 
+void setColor(const uint8_t value, const uint8_t scheme)
+{
+	const uint8_t *colors = getColors(value, scheme);
+	const uint8_t fg = colors[0];
+	const uint8_t bg = colors[1];
+	printf("\033[38;5;%d;48;5;%dm", fg, bg);
+}
+
 /** calculates `floor(log_10(n) + 1)` */
-__attribute__((pure)) uint8_t digitCount(uint32_t n)
+__attribute__((pure)) const uint8_t digitCount(uint32_t n)
 {
 	uint8_t c = 0;
 	do
@@ -55,27 +64,21 @@ __attribute__((pure)) uint8_t digitCount(uint32_t n)
 
 void drawBoard(const uint8_t board[SIZE][SIZE], const uint8_t scheme)
 {
-	uint8_t x, y, fg, bg;
 	printf("\033[H");
 	printf("2048.c %17d pts\n\n", score);
-	for (y = 0; y < SIZE; y++)
+	uint8_t x;
+	for (uint8_t y = 0; y < SIZE; y++)
 	{
 		for (x = 0; x < SIZE; x++)
 		{
-			uint8_t *colors = getColors(board[x][y], scheme);
-			fg = colors[0];
-			bg = colors[1];
-			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
+			setColor(board[x][y], scheme);
 			printf("       ");
 			printf("\033[m"); // reset
 		}
 		printf("\n");
 		for (x = 0; x < SIZE; x++)
 		{
-			uint8_t *colors = getColors(board[x][y], scheme);
-			fg = colors[0];
-			bg = colors[1];
-			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
+			setColor(board[x][y], scheme);
 			if (board[x][y] != 0)
 			{
 				uint32_t number = 1 << board[x][y];
@@ -91,17 +94,13 @@ void drawBoard(const uint8_t board[SIZE][SIZE], const uint8_t scheme)
 		printf("\n");
 		for (x = 0; x < SIZE; x++)
 		{
-			uint8_t *colors = getColors(board[x][y], scheme);
-			fg = colors[0];
-			bg = colors[1];
-			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
+			setColor(board[x][y], scheme);
 			printf("       ");
 			printf("\033[m"); // reset
 		}
 		printf("\n");
 	}
-	printf("\n");
-	printf("        ←,↑,→,↓ or q        \n");
+	printf("\n        ←,↑,→,↓ or q        \n");
 	printf("\033[A"); // one line up
 }
 
@@ -245,18 +244,12 @@ bool findPairDown(const uint8_t board[SIZE][SIZE])
 
 uint8_t countEmpty(uint8_t board[SIZE][SIZE])
 {
-	uint8_t x, y;
 	uint8_t count = 0;
-	for (x = 0; x < SIZE; x++)
-	{
-		for (y = 0; y < SIZE; y++)
-		{
+	for (uint8_t x = 0; x < SIZE; x++)
+		for (uint8_t y = 0; y < SIZE; y++)
 			if (board[x][y] == 0)
-			{
 				count++;
-			}
-		}
-	}
+
 	return count;
 }
 
@@ -345,6 +338,7 @@ void setBufferedInput(const bool enable)
 	}
 }
 
+/** calculates how many values an array has */
 unsigned long len(const a[])
 {
 	return sizeof(a) / sizeof(a[0]);
@@ -369,27 +363,24 @@ int test()
 		3, 0, 1, 1, 3, 2, 0, 0,
 		2, 0, 1, 1, 2, 2, 0, 0};
 	uint8_t *in, *out;
-	uint8_t t, tests;
-	uint8_t i;
 	bool success = true;
 
-	tests = len(data) / (2 * SIZE);
-	for (t = 0; t < tests; t++)
+	const uint8_t SIZE2 = SIZE * 2;
+	const uint8_t tests = (sizeof(data) / sizeof(data[0])) / SIZE2;
+	uint8_t i;
+	for (uint8_t t = 0; t < tests; t++)
 	{
-		in = data + t * 2 * SIZE;
+		in = data + t * SIZE2;
 		out = in + SIZE;
 		for (i = 0; i < SIZE; i++)
-		{
 			array[i] = in[i];
-		}
+
 		slideArray(array);
 		for (i = 0; i < SIZE; i++)
-		{
 			if (array[i] != out[i])
-			{
 				success = false;
-			}
-		}
+
+
 		if (success == false)
 		{
 			for (i = 0; i < SIZE; i++)
@@ -422,11 +413,11 @@ int test()
 	return !success;
 }
 
-void signal_callback_handler(int signum)
+void signal_callback_handler(const int signum)
 {
 	printf("         TERMINATED         \n");
 	setBufferedInput(true);
-	printf("\033[?25h\033[m");
+	printf(SEQ);
 	exit(signum);
 }
 
@@ -438,17 +429,14 @@ int main(int argc, char *argv[])
 	bool success;
 
 	if (argc == 2 && strcmp(argv[1], "test") == 0)
-	{
 		return test();
-	}
+
 	if (argc == 2 && strcmp(argv[1], "blackwhite") == 0)
-	{
 		scheme = 1;
-	}
+
 	if (argc == 2 && strcmp(argv[1], "bluered") == 0)
-	{
 		scheme = 2;
-	}
+
 
 	printf("\033[?25l\033[2J");
 
@@ -525,7 +513,7 @@ int main(int argc, char *argv[])
 	}
 	setBufferedInput(true);
 
-	printf("\033[?25h\033[m");
+	printf(SEQ);
 
 	return EXIT_SUCCESS;
 }
