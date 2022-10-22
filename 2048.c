@@ -17,8 +17,8 @@
 #include <time.h>
 #include <signal.h>
 
-const uint8_t SIZE = 4;
 #define ESCAPE_SEQUENCE "\033[?25h\033[m" // "IDK what to name this" @Rudxain
+const uint8_t SIZE = 4;
 uint32_t score = 0;
 
 /**
