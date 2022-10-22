@@ -17,8 +17,8 @@
 #include <time.h>
 #include <signal.h>
 
-#define SIZE 4
-#define SEQ "\033[?25h\033[m"
+const uint8_t SIZE = 4;
+#define ESCAPE_SEQUENCE "\033[?25h\033[m" // "IDK what to name this" @Rudxain
 uint32_t score = 0;
 
 /**
@@ -410,7 +410,7 @@ void signal_callback_handler(const int signum)
 {
 	printf("         TERMINATED         \n");
 	setBufferedInput(true);
-	printf(SEQ);
+	printf(ESCAPE_SEQUENCE);
 	exit(signum);
 }
 
@@ -508,7 +508,7 @@ int main(int argc, char *argv[])
 	}
 	setBufferedInput(true);
 
-	printf(SEQ);
+	printf(ESCAPE_SEQUENCE);
 
 	return EXIT_SUCCESS;
 }
