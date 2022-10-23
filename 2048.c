@@ -7,15 +7,15 @@
  */
 
 #define _XOPEN_SOURCE 500 // for: usleep
-#include <stdio.h>		  // defines: printf, puts, getchar
-#include <stdlib.h>		  // defines: EXIT_SUCCESS
-#include <string.h>		  // defines: strcmp
-#include <unistd.h>		  // defines: STDIN_FILENO, usleep
-#include <termios.h>	  // defines: termios, TCSANOW, ICANON, ECHO
-#include <stdbool.h>	  // defines: true, false
-#include <stdint.h>		  // defines: uint8_t, uint32_t
-#include <time.h>		  // defines: time
-#include <signal.h>		  // defines: signal, SIGINT
+#include <stdio.h>        // defines: printf, puts, getchar
+#include <stdlib.h>       // defines: EXIT_SUCCESS
+#include <string.h>       // defines: strcmp
+#include <unistd.h>       // defines: STDIN_FILENO, usleep
+#include <termios.h>      // defines: termios, TCSANOW, ICANON, ECHO
+#include <stdbool.h>      // defines: true, false
+#include <stdint.h>       // defines: uint8_t, uint32_t
+#include <time.h>         // defines: time
+#include <signal.h>       // defines: signal, SIGINT
 
 #define SIZE 4
 
