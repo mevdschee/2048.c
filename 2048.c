@@ -43,7 +43,7 @@ uint8_t getNumberLength(uint32_t number)
 void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 {
 	uint8_t x, y, fg, bg;
-	printf("\033[H");
+	printf("\033[H"); // move cursor to 0,0
 	printf("2048.c %17d pts\n\n", score);
 	for (y = 0; y < SIZE; y++)
 	{
@@ -52,7 +52,7 @@ void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 			getColors(board[x][y], scheme, &fg, &bg);
 			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
 			printf("       ");
-			printf("\033[m"); // reset
+			printf("\033[m"); // reset all modes
 		}
 		printf("\n");
 		for (x = 0; x < SIZE; x++)
@@ -69,7 +69,7 @@ void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 			{
 				printf("   ·   ");
 			}
-			printf("\033[m"); // reset
+			printf("\033[m"); // reset all modes
 		}
 		printf("\n");
 		for (x = 0; x < SIZE; x++)
@@ -77,7 +77,7 @@ void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 			getColors(board[x][y], scheme, &fg, &bg);
 			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
 			printf("       ");
-			printf("\033[m"); // reset
+			printf("\033[m"); // reset all modes
 		}
 		printf("\n");
 	}
@@ -424,6 +424,7 @@ void signal_callback_handler(int signum)
 {
 	printf("         TERMINATED         \n");
 	setBufferedInput(true);
+	// make cursor visible, reset all modes
 	printf("\033[?25h\033[m");
 	exit(signum);
 }
@@ -449,6 +450,7 @@ int main(int argc, char *argv[])
 		scheme = 2;
 	}
 
+	// make cursor invisible, erase entire screen
 	printf("\033[?25l\033[2J");
 
 	// register signal handler for when ctrl-c is pressed
@@ -493,7 +495,7 @@ int main(int argc, char *argv[])
 		if (success)
 		{
 			drawBoard(board, scheme, score);
-			usleep(150000);
+			usleep(150 * 1000); // 150 ms
 			addRandom(board);
 			drawBoard(board, scheme, score);
 			if (gameEnded(board))
@@ -526,6 +528,7 @@ int main(int argc, char *argv[])
 	}
 	setBufferedInput(true);
 
+	// make cursor visible, reset all modes
 	printf("\033[?25h\033[m");
 
 	return EXIT_SUCCESS;
