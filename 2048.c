@@ -344,8 +344,8 @@ int test()
 {
 	uint8_t array[SIZE];
 	// these are exponents with base 2 (1=2 2=4 3=8)
+	// data holds per line: 4x IN, 4x OUT, 1x POINTS
 	uint8_t data[] = {
-		// IN     | OUT       | POINTS
 		0, 0, 0, 1, 1, 0, 0, 0, 0,
 		0, 0, 1, 1, 2, 0, 0, 0, 4,
 		0, 1, 0, 1, 2, 0, 0, 0, 4,
