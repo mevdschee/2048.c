@@ -7,26 +7,29 @@
  */
 
 #define _XOPEN_SOURCE 500 // for: usleep
-#include <stdio.h>        // defines: printf, puts, getchar
-#include <stdlib.h>       // defines: EXIT_SUCCESS
-#include <string.h>       // defines: strcmp
-#include <unistd.h>       // defines: STDIN_FILENO, usleep
-#include <termios.h>      // defines: termios, TCSANOW, ICANON, ECHO
-#include <stdbool.h>      // defines: true, false
-#include <stdint.h>       // defines: uint8_t, uint32_t
-#include <time.h>         // defines: time
-#include <signal.h>       // defines: signal, SIGINT
+#include <stdio.h>		  // defines: printf, puts, getchar
+#include <stdlib.h>		  // defines: EXIT_SUCCESS
+#include <string.h>		  // defines: strcmp
+#include <unistd.h>		  // defines: STDIN_FILENO, usleep
+#include <termios.h>	  // defines: termios, TCSANOW, ICANON, ECHO
+#include <stdbool.h>	  // defines: true, false
+#include <stdint.h>		  // defines: uint8_t, uint32_t
+#include <time.h>		  // defines: time
+#include <signal.h>		  // defines: signal, SIGINT
 
 #define SIZE 4
 
+// this function receives 2 pointers (indicated by *) so it can set their values
 void getColors(uint8_t value, uint8_t scheme, uint8_t *foreground, uint8_t *background)
 {
 	uint8_t original[] = {8, 255, 1, 255, 2, 255, 3, 255, 4, 255, 5, 255, 6, 255, 7, 255, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 255, 0, 255, 0};
 	uint8_t blackwhite[] = {232, 255, 234, 255, 236, 255, 238, 255, 240, 255, 242, 255, 244, 255, 246, 0, 248, 0, 249, 0, 250, 0, 251, 0, 252, 0, 253, 0, 254, 0, 255, 0};
 	uint8_t bluered[] = {235, 255, 63, 255, 57, 255, 93, 255, 129, 255, 165, 255, 201, 255, 200, 255, 199, 255, 198, 255, 197, 255, 196, 255, 196, 255, 196, 255, 196, 255, 196, 255};
 	uint8_t *schemes[] = {original, blackwhite, bluered};
+	// modify the 'pointed to' variables (using a * on the left hand of the assignment)
 	*foreground = *(schemes[scheme] + (1 + value * 2) % sizeof(original));
 	*background = *(schemes[scheme] + (0 + value * 2) % sizeof(original));
+	// alternatively we could have returned a struct with two variables
 }
 
 uint8_t getNumberLength(uint32_t number)
@@ -49,6 +52,8 @@ void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 	{
 		for (x = 0; x < SIZE; x++)
 		{
+			// send the addresses of the foreground and background variables,
+			// so that they can be modified by the getColors function
 			getColors(board[x][y], scheme, &fg, &bg);
 			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
 			printf("       ");
