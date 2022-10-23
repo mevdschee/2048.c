@@ -32,7 +32,7 @@ void getColors(uint8_t value, uint8_t scheme, uint8_t *foreground, uint8_t *back
 	// alternatively we could have returned a struct with two variables
 }
 
-uint8_t getNumberLength(uint32_t number)
+uint8_t getDigitCount(uint32_t number)
 {
 	uint8_t count = 0;
 	do
@@ -67,7 +67,7 @@ void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 			if (board[x][y] != 0)
 			{
 				uint32_t number = 1 << board[x][y];
-				uint8_t t = 7 - getNumberLength(number);
+				uint8_t t = 7 - getDigitCount(number);
 				printf("%*s%u%*s", t - t / 2, "", number, t / 2, "");
 			}
 			else
