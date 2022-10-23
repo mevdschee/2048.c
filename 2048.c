@@ -18,10 +18,8 @@
 #include <signal.h>
 
 #define SIZE 4
-uint32_t score = 0;
-uint8_t scheme = 0;
 
-void getColors(uint8_t value, uint8_t *foreground, uint8_t *background)
+void getColors(uint8_t value, uint8_t scheme, uint8_t *foreground, uint8_t *background)
 {
 	uint8_t original[] = {8, 255, 1, 255, 2, 255, 3, 255, 4, 255, 5, 255, 6, 255, 7, 255, 9, 0, 10, 0, 11, 0, 12, 0, 13, 0, 14, 0, 255, 0, 255, 0};
 	uint8_t blackwhite[] = {232, 255, 234, 255, 236, 255, 238, 255, 240, 255, 242, 255, 244, 255, 246, 0, 248, 0, 249, 0, 250, 0, 251, 0, 252, 0, 253, 0, 254, 0, 255, 0};
@@ -42,7 +40,7 @@ uint8_t getNumberLength(uint32_t number)
 	return count;
 }
 
-void drawBoard(uint8_t board[SIZE][SIZE])
+void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 {
 	uint8_t x, y, fg, bg;
 	printf("\033[H");
@@ -51,7 +49,7 @@ void drawBoard(uint8_t board[SIZE][SIZE])
 	{
 		for (x = 0; x < SIZE; x++)
 		{
-			getColors(board[x][y], &fg, &bg);
+			getColors(board[x][y], scheme, &fg, &bg);
 			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
 			printf("       ");
 			printf("\033[m"); // reset
@@ -59,7 +57,7 @@ void drawBoard(uint8_t board[SIZE][SIZE])
 		printf("\n");
 		for (x = 0; x < SIZE; x++)
 		{
-			getColors(board[x][y], &fg, &bg);
+			getColors(board[x][y], scheme, &fg, &bg);
 			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
 			if (board[x][y] != 0)
 			{
@@ -76,7 +74,7 @@ void drawBoard(uint8_t board[SIZE][SIZE])
 		printf("\n");
 		for (x = 0; x < SIZE; x++)
 		{
-			getColors(board[x][y], &fg, &bg);
+			getColors(board[x][y], scheme, &fg, &bg);
 			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
 			printf("       ");
 			printf("\033[m"); // reset
@@ -120,7 +118,7 @@ uint8_t findTarget(uint8_t array[SIZE], uint8_t x, uint8_t stop)
 	return x;
 }
 
-bool slideArray(uint8_t array[SIZE])
+bool slideArray(uint8_t array[SIZE], uint32_t *score)
 {
 	bool success = false;
 	uint8_t x, t, stop = 0;
@@ -143,7 +141,7 @@ bool slideArray(uint8_t array[SIZE])
 					// merge (increase power of two)
 					array[t]++;
 					// increase score
-					score += (uint32_t)1 << array[t];
+					*score += (uint32_t)1 << array[t];
 					// set stop to avoid double merge
 					stop = t + 1;
 				}
@@ -172,46 +170,46 @@ void rotateBoard(uint8_t board[SIZE][SIZE])
 	}
 }
 
-bool moveUp(uint8_t board[SIZE][SIZE])
+bool moveUp(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	bool success = false;
 	uint8_t x;
 	for (x = 0; x < SIZE; x++)
 	{
-		success |= slideArray(board[x]);
+		success |= slideArray(board[x], score);
 	}
 	return success;
 }
 
-bool moveLeft(uint8_t board[SIZE][SIZE])
+bool moveLeft(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	bool success;
 	rotateBoard(board);
-	success = moveUp(board);
+	success = moveUp(board, score);
 	rotateBoard(board);
 	rotateBoard(board);
 	rotateBoard(board);
 	return success;
 }
 
-bool moveDown(uint8_t board[SIZE][SIZE])
+bool moveDown(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	bool success;
 	rotateBoard(board);
 	rotateBoard(board);
-	success = moveUp(board);
+	success = moveUp(board, score);
 	rotateBoard(board);
 	rotateBoard(board);
 	return success;
 }
 
-bool moveRight(uint8_t board[SIZE][SIZE])
+bool moveRight(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	bool success;
 	rotateBoard(board);
 	rotateBoard(board);
 	rotateBoard(board);
-	success = moveUp(board);
+	success = moveUp(board, score);
 	rotateBoard(board);
 	return success;
 }
@@ -312,8 +310,6 @@ void initBoard(uint8_t board[SIZE][SIZE])
 	}
 	addRandom(board);
 	addRandom(board);
-	drawBoard(board);
-	score = 0;
 }
 
 void setBufferedInput(bool enable)
@@ -349,40 +345,48 @@ int test()
 	uint8_t array[SIZE];
 	// these are exponents with base 2 (1=2 2=4 3=8)
 	uint8_t data[] = {
-		0, 0, 0, 1, 1, 0, 0, 0,
-		0, 0, 1, 1, 2, 0, 0, 0,
-		0, 1, 0, 1, 2, 0, 0, 0,
-		1, 0, 0, 1, 2, 0, 0, 0,
-		1, 0, 1, 0, 2, 0, 0, 0,
-		1, 1, 1, 0, 2, 1, 0, 0,
-		1, 0, 1, 1, 2, 1, 0, 0,
-		1, 1, 0, 1, 2, 1, 0, 0,
-		1, 1, 1, 1, 2, 2, 0, 0,
-		2, 2, 1, 1, 3, 2, 0, 0,
-		1, 1, 2, 2, 2, 3, 0, 0,
-		3, 0, 1, 1, 3, 2, 0, 0,
-		2, 0, 1, 1, 2, 2, 0, 0};
-	uint8_t *in, *out;
+		// IN     | OUT       | POINTS
+		0, 0, 0, 1, 1, 0, 0, 0, 0,
+		0, 0, 1, 1, 2, 0, 0, 0, 4,
+		0, 1, 0, 1, 2, 0, 0, 0, 4,
+		1, 0, 0, 1, 2, 0, 0, 0, 4,
+		1, 0, 1, 0, 2, 0, 0, 0, 4,
+		1, 1, 1, 0, 2, 1, 0, 0, 4,
+		1, 0, 1, 1, 2, 1, 0, 0, 4,
+		1, 1, 0, 1, 2, 1, 0, 0, 4,
+		1, 1, 1, 1, 2, 2, 0, 0, 8,
+		2, 2, 1, 1, 3, 2, 0, 0, 12,
+		1, 1, 2, 2, 2, 3, 0, 0, 12,
+		3, 0, 1, 1, 3, 2, 0, 0, 4,
+		2, 0, 1, 1, 2, 2, 0, 0, 4};
+	uint8_t *in, *out, *points;
 	uint8_t t, tests;
 	uint8_t i;
 	bool success = true;
+	uint32_t score;
 
-	tests = (sizeof(data) / sizeof(data[0])) / (2 * SIZE);
+	tests = (sizeof(data) / sizeof(data[0])) / (2 * SIZE + 1);
 	for (t = 0; t < tests; t++)
 	{
-		in = data + t * 2 * SIZE;
+		in = data + t * (2 * SIZE + 1);
 		out = in + SIZE;
+		points = in + 2 * SIZE;
 		for (i = 0; i < SIZE; i++)
 		{
 			array[i] = in[i];
 		}
-		slideArray(array);
+		score = 0;
+		slideArray(array, &score);
 		for (i = 0; i < SIZE; i++)
 		{
 			if (array[i] != out[i])
 			{
 				success = false;
 			}
+		}
+		if (score != *points)
+		{
+			success = false;
 		}
 		if (success == false)
 		{
@@ -395,7 +399,7 @@ int test()
 			{
 				printf("%d ", array[i]);
 			}
-			printf("expected ");
+			printf("(%d points) expected ", score);
 			for (i = 0; i < SIZE; i++)
 			{
 				printf("%d ", in[i]);
@@ -405,7 +409,7 @@ int test()
 			{
 				printf("%d ", out[i]);
 			}
-			printf("\n");
+			printf("(%d points)\n", *points);
 			break;
 		}
 	}
@@ -427,6 +431,8 @@ void signal_callback_handler(int signum)
 int main(int argc, char *argv[])
 {
 	uint8_t board[SIZE][SIZE];
+	uint8_t scheme = 0;
+	uint32_t score = 0;
 	char c;
 	bool success;
 
@@ -450,6 +456,7 @@ int main(int argc, char *argv[])
 
 	initBoard(board);
 	setBufferedInput(false);
+	drawBoard(board, scheme, score);
 	while (true)
 	{
 		c = getchar();
@@ -463,32 +470,32 @@ int main(int argc, char *argv[])
 		case 97:  // 'a' key
 		case 104: // 'h' key
 		case 68:  // left arrow
-			success = moveLeft(board);
+			success = moveLeft(board, &score);
 			break;
 		case 100: // 'd' key
 		case 108: // 'l' key
 		case 67:  // right arrow
-			success = moveRight(board);
+			success = moveRight(board, &score);
 			break;
 		case 119: // 'w' key
 		case 107: // 'k' key
 		case 65:  // up arrow
-			success = moveUp(board);
+			success = moveUp(board, &score);
 			break;
 		case 115: // 's' key
 		case 106: // 'j' key
 		case 66:  // down arrow
-			success = moveDown(board);
+			success = moveDown(board, &score);
 			break;
 		default:
 			success = false;
 		}
 		if (success)
 		{
-			drawBoard(board);
+			drawBoard(board, scheme, score);
 			usleep(150000);
 			addRandom(board);
-			drawBoard(board);
+			drawBoard(board, scheme, score);
 			if (gameEnded(board))
 			{
 				printf("         GAME OVER          \n");
@@ -503,7 +510,7 @@ int main(int argc, char *argv[])
 			{
 				break;
 			}
-			drawBoard(board);
+			drawBoard(board, scheme, score);
 		}
 		if (c == 'r')
 		{
@@ -512,8 +519,9 @@ int main(int argc, char *argv[])
 			if (c == 'y')
 			{
 				initBoard(board);
+				score = 0;
 			}
-			drawBoard(board);
+			drawBoard(board, scheme, score);
 		}
 	}
 	setBufferedInput(true);
