@@ -6,7 +6,7 @@
  ============================================================================
  */
 
-#define _XOPEN_SOURCE 500 // defines: usleep
+#define _XOPEN_SOURCE 500 // for: usleep
 #include <stdio.h>		  // defines: printf, puts, getchar
 #include <stdlib.h>		  // defines: EXIT_SUCCESS
 #include <string.h>		  // defines: strcmp
