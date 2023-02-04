@@ -19,7 +19,7 @@
 
 #define SIZE 4
 
-#define N_POSSIBLE_UNDOS 10
+#define N_POSSIBLE_UNDOS 3
 
 uint8_t boards_stack[N_POSSIBLE_UNDOS][SIZE][SIZE];
 int stackPointer = 0;
@@ -181,13 +181,32 @@ void rotateBoard(uint8_t board[SIZE][SIZE])
 	}
 }
 
+void add_to_stack(uint8_t board[SIZE][SIZE]);
+
+void copyBoard(uint8_t board[SIZE][SIZE], uint8_t old_board[SIZE][SIZE])
+{
+	uint8_t x, y;
+	for (y = 0; y < SIZE; y++)
+	{
+		for (x = 0; x < SIZE; x++)
+		{
+			old_board[x][y] = board[x][y];
+		}
+	}
+}
+
 bool moveUp(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	bool success = false;
+	uint8_t old_board[SIZE][SIZE];
+	copyBoard(board, old_board);
 	uint8_t x;
 	for (x = 0; x < SIZE; x++)
 	{
 		success |= slideArray(board[x], score);
+	}
+	if (success) {
+		add_to_stack(old_board);
 	}
 	return success;
 }
@@ -195,33 +214,48 @@ bool moveUp(uint8_t board[SIZE][SIZE], uint32_t *score)
 bool moveLeft(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	bool success;
+	uint8_t old_board[SIZE][SIZE];
+	copyBoard(board, old_board);
 	rotateBoard(board);
 	success = moveUp(board, score);
 	rotateBoard(board);
 	rotateBoard(board);
 	rotateBoard(board);
+	if (success) {
+		add_to_stack(old_board);
+	}
 	return success;
 }
 
 bool moveDown(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	bool success;
+	uint8_t old_board[SIZE][SIZE];
+	copyBoard(board, old_board);
 	rotateBoard(board);
 	rotateBoard(board);
 	success = moveUp(board, score);
 	rotateBoard(board);
 	rotateBoard(board);
+	if (success) {
+		add_to_stack(old_board);
+	}
 	return success;
 }
 
 bool moveRight(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	bool success;
+	uint8_t old_board[SIZE][SIZE];
+	copyBoard(board, old_board);
 	rotateBoard(board);
 	rotateBoard(board);
 	rotateBoard(board);
 	success = moveUp(board, score);
 	rotateBoard(board);
+	if (success) {
+		add_to_stack(old_board);
+	}
 	return success;
 }
 
@@ -375,14 +409,21 @@ void copyArrayFromStack(uint8_t board[SIZE][SIZE], int sp)
 	}
 }
 
-void add_to_stack(uint8_t board[SIZE][SIZE])
-{
-	copyArrayToStack(board);
+	
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
+void add_to_stack(uint8_t board[SIZE][SIZE])
+{
+	copyArrayToStack(board);
 	stackSize = MIN(stackSize + 1, N_POSSIBLE_UNDOS);
 	stackPointer = (stackPointer + 1) % N_POSSIBLE_UNDOS;
+}
+
+void popFromStack()
+{
+	stackSize = MAX(stackSize - 1, 0);
+	stackPointer = (stackPointer + N_POSSIBLE_UNDOS - 1) % N_POSSIBLE_UNDOS;
 }
 
 void undo(uint8_t board[SIZE][SIZE])
@@ -529,25 +570,21 @@ int main(int argc, char *argv[])
 		case 97:  // 'a' key
 		case 104: // 'h' key
 		case 68:  // left arrow
-			add_to_stack(board);
 			success = moveLeft(board, &score);
 			break;
 		case 100: // 'd' key
 		case 108: // 'l' key
 		case 67:  // right arrow
-			add_to_stack(board);
 			success = moveRight(board, &score);
 			break;
 		case 119: // 'w' key
 		case 107: // 'k' key
 		case 65:  // up arrow
-			add_to_stack(board);
 			success = moveUp(board, &score);
 			break;
 		case 115: // 's' key
 		case 106: // 'j' key
 		case 66:  // down arrow
-			add_to_stack(board);
 			success = moveDown(board, &score);
 			break;
 		case 122: // 'z' key
