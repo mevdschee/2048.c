@@ -22,6 +22,7 @@
 #define N_POSSIBLE_UNDOS 3
 
 uint8_t boardsStack[N_POSSIBLE_UNDOS][SIZE][SIZE];
+uint32_t scores[N_POSSIBLE_UNDOS];
 int stackPointer = 0;
 int stackSize = 0;
 
@@ -52,9 +53,10 @@ void copyArrayFromStack(uint8_t board[SIZE][SIZE], int sp)
 #define MAX(x, y) (((x) > (y)) ? (x) : (y))
 #define MIN(x, y) (((x) < (y)) ? (x) : (y))
 
-void pushToStack(uint8_t board[SIZE][SIZE])
+void pushToStack(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	copyArrayToStack(board);
+	scores[stackPointer] = *score;
 	stackSize = MIN(stackSize + 1, N_POSSIBLE_UNDOS);
 	stackPointer = (stackPointer + 1) % N_POSSIBLE_UNDOS;
 }
@@ -65,13 +67,14 @@ void popFromStack()
 	stackPointer = (stackPointer + N_POSSIBLE_UNDOS - 1) % N_POSSIBLE_UNDOS;
 }
 
-void undo(uint8_t board[SIZE][SIZE])
+void undo(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	if (stackSize == 0)
 		return;
 	stackSize = MAX(stackSize - 1, 0);
 	stackPointer = (stackPointer + N_POSSIBLE_UNDOS - 1) % N_POSSIBLE_UNDOS;
 	copyArrayFromStack(board, stackPointer);
+	*score = scores[stackPointer];
 }
 
 // this function receives 2 pointers (indicated by *) so it can set their values
@@ -539,6 +542,7 @@ int main(int argc, char *argv[])
 		c = getchar();
 		uint8_t oldBoard[SIZE][SIZE];
 		copyBoard(board, oldBoard);
+		uint32_t oldScore = score;
 		if (c == -1)
 		{
 			puts("\nError! Cannot read keyboard input!");
@@ -567,7 +571,7 @@ int main(int argc, char *argv[])
 			success = moveDown(board, &score);
 			break;
 		case 122: // 'z' key
-			undo(board);
+			undo(board, &score);
 			success = false;
 			drawBoard(board, scheme, score);
 			usleep(150 * 1000); // 150 ms
@@ -577,7 +581,7 @@ int main(int argc, char *argv[])
 		}
 		if (success)
 		{
-			pushToStack(oldBoard);
+			pushToStack(oldBoard, &oldScore);
 			drawBoard(board, scheme, score);
 			usleep(150 * 1000); // 150 ms
 			addRandom(board);
