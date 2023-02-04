@@ -7,17 +7,23 @@
  */
 
 #define _XOPEN_SOURCE 500 // for: usleep
-#include <stdio.h>	  // defines: printf, puts, getchar
-#include <stdlib.h>	  // defines: EXIT_SUCCESS
-#include <string.h>	  // defines: strcmp
-#include <unistd.h>	  // defines: STDIN_FILENO, usleep
+#include <stdio.h>		  // defines: printf, puts, getchar
+#include <stdlib.h>		  // defines: EXIT_SUCCESS
+#include <string.h>		  // defines: strcmp
+#include <unistd.h>		  // defines: STDIN_FILENO, usleep
 #include <termios.h>	  // defines: termios, TCSANOW, ICANON, ECHO
 #include <stdbool.h>	  // defines: true, false
-#include <stdint.h>	  // defines: uint8_t, uint32_t
-#include <time.h>	  // defines: time
-#include <signal.h>	  // defines: signal, SIGINT
+#include <stdint.h>		  // defines: uint8_t, uint32_t
+#include <time.h>		  // defines: time
+#include <signal.h>		  // defines: signal, SIGINT
 
 #define SIZE 4
+
+#define N_POSSIBLE_UNDOS 10
+
+uint8_t boards_stack[N_POSSIBLE_UNDOS][SIZE][SIZE];
+int stackPointer = 0;
+int stackSize = 0;
 
 // this function receives 2 pointers (indicated by *) so it can set their values
 void getColors(uint8_t value, uint8_t scheme, uint8_t *foreground, uint8_t *background)
@@ -345,25 +351,68 @@ void setBufferedInput(bool enable)
 	}
 }
 
+void copyArrayToStack(uint8_t board[SIZE][SIZE])
+{
+	uint8_t x, y;
+	for (x = 0; x < SIZE; x++)
+	{
+		for (y = 0; y < SIZE; y++)
+		{
+			boards_stack[stackPointer][x][y] = board[x][y];
+		}
+	}
+}
+
+void copyArrayFromStack(uint8_t board[SIZE][SIZE], int sp)
+{
+	uint8_t x, y;
+	for (x = 0; x < SIZE; x++)
+	{
+		for (y = 0; y < SIZE; y++)
+		{
+			board[x][y] = boards_stack[sp][x][y];
+		}
+	}
+}
+
+void add_to_stack(uint8_t board[SIZE][SIZE])
+{
+	copyArrayToStack(board);
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
+	stackSize = MIN(stackSize + 1, N_POSSIBLE_UNDOS);
+	stackPointer = (stackPointer + 1) % N_POSSIBLE_UNDOS;
+}
+
+void undo(uint8_t board[SIZE][SIZE])
+{
+	if (stackSize == 0)
+		return;
+	stackSize = MAX(stackSize - 1, 0);
+	stackPointer = (stackPointer + N_POSSIBLE_UNDOS - 1) % N_POSSIBLE_UNDOS;
+	copyArrayFromStack(board, stackPointer);
+}
+
 int test()
 {
 	uint8_t array[SIZE];
 	// these are exponents with base 2 (1=2 2=4 3=8)
 	// data holds per line: 4x IN, 4x OUT, 1x POINTS
 	uint8_t data[] = {
-	    0, 0, 0, 1, 1, 0, 0, 0, 0,
-	    0, 0, 1, 1, 2, 0, 0, 0, 4,
-	    0, 1, 0, 1, 2, 0, 0, 0, 4,
-	    1, 0, 0, 1, 2, 0, 0, 0, 4,
-	    1, 0, 1, 0, 2, 0, 0, 0, 4,
-	    1, 1, 1, 0, 2, 1, 0, 0, 4,
-	    1, 0, 1, 1, 2, 1, 0, 0, 4,
-	    1, 1, 0, 1, 2, 1, 0, 0, 4,
-	    1, 1, 1, 1, 2, 2, 0, 0, 8,
-	    2, 2, 1, 1, 3, 2, 0, 0, 12,
-	    1, 1, 2, 2, 2, 3, 0, 0, 12,
-	    3, 0, 1, 1, 3, 2, 0, 0, 4,
-	    2, 0, 1, 1, 2, 2, 0, 0, 4};
+		0, 0, 0, 1, 1, 0, 0, 0, 0,
+		0, 0, 1, 1, 2, 0, 0, 0, 4,
+		0, 1, 0, 1, 2, 0, 0, 0, 4,
+		1, 0, 0, 1, 2, 0, 0, 0, 4,
+		1, 0, 1, 0, 2, 0, 0, 0, 4,
+		1, 1, 1, 0, 2, 1, 0, 0, 4,
+		1, 0, 1, 1, 2, 1, 0, 0, 4,
+		1, 1, 0, 1, 2, 1, 0, 0, 4,
+		1, 1, 1, 1, 2, 2, 0, 0, 8,
+		2, 2, 1, 1, 3, 2, 0, 0, 12,
+		1, 1, 2, 2, 2, 3, 0, 0, 12,
+		3, 0, 1, 1, 3, 2, 0, 0, 4,
+		2, 0, 1, 1, 2, 2, 0, 0, 4};
 	uint8_t *in, *out, *points;
 	uint8_t t, tests;
 	uint8_t i;
@@ -462,6 +511,9 @@ int main(int argc, char *argv[])
 	signal(SIGINT, signal_callback_handler);
 
 	initBoard(board);
+	copyArrayToStack(board);
+	stackPointer = (stackPointer + 1) % N_POSSIBLE_UNDOS;
+	++stackSize;
 	setBufferedInput(false);
 	drawBoard(board, scheme, score);
 	while (true)
@@ -477,22 +529,32 @@ int main(int argc, char *argv[])
 		case 97:  // 'a' key
 		case 104: // 'h' key
 		case 68:  // left arrow
+			add_to_stack(board);
 			success = moveLeft(board, &score);
 			break;
 		case 100: // 'd' key
 		case 108: // 'l' key
 		case 67:  // right arrow
+			add_to_stack(board);
 			success = moveRight(board, &score);
 			break;
 		case 119: // 'w' key
 		case 107: // 'k' key
 		case 65:  // up arrow
+			add_to_stack(board);
 			success = moveUp(board, &score);
 			break;
 		case 115: // 's' key
 		case 106: // 'j' key
 		case 66:  // down arrow
+			add_to_stack(board);
 			success = moveDown(board, &score);
+			break;
+		case 122: // 'z' key
+			undo(board);
+			success = false;
+			drawBoard(board, scheme, score);
+			usleep(150 * 1000); // 150 ms
 			break;
 		default:
 			success = false;
