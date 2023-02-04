@@ -21,9 +21,58 @@
 
 #define N_POSSIBLE_UNDOS 3
 
-uint8_t boards_stack[N_POSSIBLE_UNDOS][SIZE][SIZE];
+uint8_t boardsStack[N_POSSIBLE_UNDOS][SIZE][SIZE];
 int stackPointer = 0;
 int stackSize = 0;
+
+void copyArrayToStack(uint8_t board[SIZE][SIZE])
+{
+	uint8_t x, y;
+	for (x = 0; x < SIZE; x++)
+	{
+		for (y = 0; y < SIZE; y++)
+		{
+			boardsStack[stackPointer][x][y] = board[x][y];
+		}
+	}
+}
+
+void copyArrayFromStack(uint8_t board[SIZE][SIZE], int sp)
+{
+	uint8_t x, y;
+	for (x = 0; x < SIZE; x++)
+	{
+		for (y = 0; y < SIZE; y++)
+		{
+			board[x][y] = boardsStack[sp][x][y];
+		}
+	}
+}
+
+#define MAX(x, y) (((x) > (y)) ? (x) : (y))
+#define MIN(x, y) (((x) < (y)) ? (x) : (y))
+
+void pushToStack(uint8_t board[SIZE][SIZE])
+{
+	copyArrayToStack(board);
+	stackSize = MIN(stackSize + 1, N_POSSIBLE_UNDOS);
+	stackPointer = (stackPointer + 1) % N_POSSIBLE_UNDOS;
+}
+
+void popFromStack()
+{
+	stackSize = MAX(stackSize - 1, 0);
+	stackPointer = (stackPointer + N_POSSIBLE_UNDOS - 1) % N_POSSIBLE_UNDOS;
+}
+
+void undo(uint8_t board[SIZE][SIZE])
+{
+	if (stackSize == 0)
+		return;
+	stackSize = MAX(stackSize - 1, 0);
+	stackPointer = (stackPointer + N_POSSIBLE_UNDOS - 1) % N_POSSIBLE_UNDOS;
+	copyArrayFromStack(board, stackPointer);
+}
 
 // this function receives 2 pointers (indicated by *) so it can set their values
 void getColors(uint8_t value, uint8_t scheme, uint8_t *foreground, uint8_t *background)
@@ -181,8 +230,6 @@ void rotateBoard(uint8_t board[SIZE][SIZE])
 	}
 }
 
-void add_to_stack(uint8_t board[SIZE][SIZE]);
-
 void copyBoard(uint8_t board[SIZE][SIZE], uint8_t old_board[SIZE][SIZE])
 {
 	uint8_t x, y;
@@ -198,15 +245,10 @@ void copyBoard(uint8_t board[SIZE][SIZE], uint8_t old_board[SIZE][SIZE])
 bool moveUp(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	bool success = false;
-	uint8_t old_board[SIZE][SIZE];
-	copyBoard(board, old_board);
 	uint8_t x;
 	for (x = 0; x < SIZE; x++)
 	{
 		success |= slideArray(board[x], score);
-	}
-	if (success) {
-		add_to_stack(old_board);
 	}
 	return success;
 }
@@ -214,48 +256,33 @@ bool moveUp(uint8_t board[SIZE][SIZE], uint32_t *score)
 bool moveLeft(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	bool success;
-	uint8_t old_board[SIZE][SIZE];
-	copyBoard(board, old_board);
 	rotateBoard(board);
 	success = moveUp(board, score);
 	rotateBoard(board);
 	rotateBoard(board);
 	rotateBoard(board);
-	if (success) {
-		add_to_stack(old_board);
-	}
 	return success;
 }
 
 bool moveDown(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	bool success;
-	uint8_t old_board[SIZE][SIZE];
-	copyBoard(board, old_board);
 	rotateBoard(board);
 	rotateBoard(board);
 	success = moveUp(board, score);
 	rotateBoard(board);
 	rotateBoard(board);
-	if (success) {
-		add_to_stack(old_board);
-	}
 	return success;
 }
 
 bool moveRight(uint8_t board[SIZE][SIZE], uint32_t *score)
 {
 	bool success;
-	uint8_t old_board[SIZE][SIZE];
-	copyBoard(board, old_board);
 	rotateBoard(board);
 	rotateBoard(board);
 	rotateBoard(board);
 	success = moveUp(board, score);
 	rotateBoard(board);
-	if (success) {
-		add_to_stack(old_board);
-	}
 	return success;
 }
 
@@ -385,56 +412,6 @@ void setBufferedInput(bool enable)
 	}
 }
 
-void copyArrayToStack(uint8_t board[SIZE][SIZE])
-{
-	uint8_t x, y;
-	for (x = 0; x < SIZE; x++)
-	{
-		for (y = 0; y < SIZE; y++)
-		{
-			boards_stack[stackPointer][x][y] = board[x][y];
-		}
-	}
-}
-
-void copyArrayFromStack(uint8_t board[SIZE][SIZE], int sp)
-{
-	uint8_t x, y;
-	for (x = 0; x < SIZE; x++)
-	{
-		for (y = 0; y < SIZE; y++)
-		{
-			board[x][y] = boards_stack[sp][x][y];
-		}
-	}
-}
-
-	
-#define MAX(x, y) (((x) > (y)) ? (x) : (y))
-#define MIN(x, y) (((x) < (y)) ? (x) : (y))
-
-void add_to_stack(uint8_t board[SIZE][SIZE])
-{
-	copyArrayToStack(board);
-	stackSize = MIN(stackSize + 1, N_POSSIBLE_UNDOS);
-	stackPointer = (stackPointer + 1) % N_POSSIBLE_UNDOS;
-}
-
-void popFromStack()
-{
-	stackSize = MAX(stackSize - 1, 0);
-	stackPointer = (stackPointer + N_POSSIBLE_UNDOS - 1) % N_POSSIBLE_UNDOS;
-}
-
-void undo(uint8_t board[SIZE][SIZE])
-{
-	if (stackSize == 0)
-		return;
-	stackSize = MAX(stackSize - 1, 0);
-	stackPointer = (stackPointer + N_POSSIBLE_UNDOS - 1) % N_POSSIBLE_UNDOS;
-	copyArrayFromStack(board, stackPointer);
-}
-
 int test()
 {
 	uint8_t array[SIZE];
@@ -560,6 +537,8 @@ int main(int argc, char *argv[])
 	while (true)
 	{
 		c = getchar();
+		uint8_t oldBoard[SIZE][SIZE];
+		copyBoard(board, oldBoard);
 		if (c == -1)
 		{
 			puts("\nError! Cannot read keyboard input!");
@@ -598,6 +577,7 @@ int main(int argc, char *argv[])
 		}
 		if (success)
 		{
+			pushToStack(oldBoard);
 			drawBoard(board, scheme, score);
 			usleep(150 * 1000); // 150 ms
 			addRandom(board);
