@@ -19,10 +19,14 @@ Tested on: GNU/Linux, FreeBSD, OpenBSD
 
 ### Installation
 
-#### On Debian, Ubuntu derivatives
-Install from package manager: `sudo apt install 2048`
+On Debian (based) systems:
 
-#### Source Installation
+```
+sudo apt install 2048
+```
+
+Or compile from source:
+
 ```
 wget https://raw.githubusercontent.com/mevdschee/2048.c/master/2048.c
 gcc -o 2048 2048.c
