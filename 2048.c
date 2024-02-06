@@ -530,6 +530,10 @@ int main(int argc, char *argv[])
 			}
 			drawBoard(board, scheme, score);
 		}
+		if (c == 'h')
+		{
+			printf(" help statement \n");
+		}
 	}
 	setBufferedInput(true);
 
