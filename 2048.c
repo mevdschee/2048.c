@@ -531,7 +531,7 @@ int main(int argc, char *argv[])
 		}
         if (c == 'h')
         {
-            printf("Use arrows to combine alike numbers. Press q to quit, any key to continue, and r to restart. \n");
+            printf("Use arrows to combine like numbers. Press q to quit, any key to continue, and r to restart. \n");
             printf("\33[2K\r");
             printf("\33[2K\r");
             printf("\33[2K\r");
