@@ -22,7 +22,7 @@ Testeado en: GNU/Linux, FreeBSD, OpenBSD
 En sistemas Debian (basados):
 
 ```
-sudo apto instalar 2048
+sudo apt install 2048
 ```
 
 O compilar desde la fuente (recomendado):
