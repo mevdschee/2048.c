@@ -87,7 +87,7 @@ void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 		printf("\n");
 	}
 	printf("\n");
-	printf("        ←,↑,→,↓ or q        \n");
+	printf("        ←,↑,→,↓ or q                                                                                   \n");
 	printf("\033[A"); // one line up
 }
 
@@ -475,7 +475,6 @@ int main(int argc, char *argv[])
 		switch (c)
 		{
 		case 97:  // 'a' key
-		case 104: // 'h' key
 		case 68:  // left arrow
 			success = moveLeft(board, &score);
 			break;
@@ -505,13 +504,13 @@ int main(int argc, char *argv[])
 			drawBoard(board, scheme, score);
 			if (gameEnded(board))
 			{
-				printf("         GAME OVER          \n");
+				printf("         GAME OVER                                                                       \n");
 				break;
 			}
 		}
 		if (c == 'q')
 		{
-			printf("        QUIT? (y/n)         \n");
+			printf("        QUIT? (y/n)                                                                       \n");
 			c = getchar();
 			if (c == 'y')
 			{
@@ -521,7 +520,7 @@ int main(int argc, char *argv[])
 		}
 		if (c == 'r')
 		{
-			printf("       RESTART? (y/n)       \n");
+			printf("       RESTART? (y/n)                                                                          \n");
 			c = getchar();
 			if (c == 'y')
 			{
@@ -530,6 +529,15 @@ int main(int argc, char *argv[])
 			}
 			drawBoard(board, scheme, score);
 		}
+        if (c == 'h')
+        {
+            printf("Use arrows to combine like numbers. Press q to quit, any key to continue, and r to restart. \n");
+            printf("\33[2K\r");
+            printf("\33[2K\r");
+            printf("\33[2K\r");
+            c = getchar();
+            drawBoard(board, scheme, score);
+        }
 	}
 	setBufferedInput(true);
 
