@@ -6,7 +6,7 @@
  ============================================================================
  */
 
-#define VERSION "1.0.2"
+#define VERSION "1.0.3"
 
 #define _XOPEN_SOURCE 500 // for: usleep
 #include <stdio.h>		  // defines: printf, puts, getchar
@@ -57,7 +57,7 @@ void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 			// send the addresses of the foreground and background variables,
 			// so that they can be modified by the getColors function
 			getColors(board[x][y], scheme, &fg, &bg);
-			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
+			printf("\033[38;5;%u;48;5;%um", fg, bg); // set color
 			printf("       ");
 			printf("\033[m"); // reset all modes
 		}
@@ -65,7 +65,7 @@ void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 		for (x = 0; x < SIZE; x++)
 		{
 			getColors(board[x][y], scheme, &fg, &bg);
-			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
+			printf("\033[38;5;%u;48;5;%um", fg, bg); // set color
 			if (board[x][y] != 0)
 			{
 				uint32_t number = 1 << board[x][y];
@@ -82,7 +82,7 @@ void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 		for (x = 0; x < SIZE; x++)
 		{
 			getColors(board[x][y], scheme, &fg, &bg);
-			printf("\033[38;5;%d;48;5;%dm", fg, bg); // set color
+			printf("\033[38;5;%u;48;5;%um", fg, bg); // set color
 			printf("       ");
 			printf("\033[m"); // reset all modes
 		}
@@ -148,7 +148,7 @@ bool slideArray(uint8_t array[SIZE], uint32_t *score)
 					// merge (increase power of two)
 					array[t]++;
 					// increase score
-					*score += (uint32_t)1 << array[t];
+					*score += 1 << array[t];
 					// set stop to avoid double merge
 					stop = t + 1;
 				}
@@ -166,7 +166,7 @@ void rotateBoard(uint8_t board[SIZE][SIZE])
 	uint8_t tmp;
 	for (i = 0; i < n / 2; i++)
 	{
-		for (j = i; j < (uint8_t)(n - i - 1); j++)
+		for (j = i; j < n - i - 1; j++)
 		{
 			tmp = board[i][j];
 			board[i][j] = board[j][n - i - 1];
@@ -347,7 +347,7 @@ void setBufferedInput(bool enable)
 	}
 }
 
-int test()
+bool testSucceed()
 {
 	uint8_t array[SIZE];
 	// these are exponents with base 2 (1=2 2=4 3=8)
@@ -399,24 +399,24 @@ int test()
 		{
 			for (i = 0; i < SIZE; i++)
 			{
-				printf("%d ", in[i]);
+				printf("%u ", in[i]);
 			}
 			printf("=> ");
 			for (i = 0; i < SIZE; i++)
 			{
-				printf("%d ", array[i]);
+				printf("%u ", array[i]);
 			}
 			printf("(%u points) expected ", score);
 			for (i = 0; i < SIZE; i++)
 			{
-				printf("%d ", in[i]);
+				printf("%u ", in[i]);
 			}
 			printf("=> ");
 			for (i = 0; i < SIZE; i++)
 			{
-				printf("%d ", out[i]);
+				printf("%u ", out[i]);
 			}
-			printf("(%d points)\n", *points);
+			printf("(%u points)\n", *points);
 			break;
 		}
 	}
@@ -424,7 +424,7 @@ int test()
 	{
 		printf("All %u tests executed successfully\n", tests);
 	}
-	return !success;
+	return success;
 }
 
 void signal_callback_handler(int signum)
@@ -474,7 +474,7 @@ int main(int argc, char *argv[])
 		}
 		else if (strcmp(argv[1], "test") == 0)
 		{
-			return test();
+			return testSucceed() ? EXIT_SUCCESS : EXIT_FAILURE;
 		}
 		else
 		{
