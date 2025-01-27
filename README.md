@@ -40,6 +40,7 @@ The game supports different color schemes. This depends on ANSI support for 88 o
 ```
 ./2048
 ```
+
 For the black-to-white color scheme (requires 256 colors):
 
 ```
@@ -52,10 +53,16 @@ For the blue-to-red color scheme (requires 256 colors):
 ./2048 bluered
 ```
 
-Show help message (shows all supported CLI options):
+Show the version information
 
 ```
-./2048 help
+./2048 --version
+```
+
+Show help message (shows all supported command line options):
+
+```
+./2048 --help
 ```
 
 ### Contributing

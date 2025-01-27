@@ -6,19 +6,20 @@
  ============================================================================
  */
 
+#define VERSION "1.0.2"
+
 #define _XOPEN_SOURCE 500 // for: usleep
-#include <stdio.h>	  // defines: printf, puts, getchar
-#include <stdlib.h>	  // defines: EXIT_SUCCESS
-#include <string.h>	  // defines: strcmp
-#include <unistd.h>	  // defines: STDIN_FILENO, usleep
+#include <stdio.h>		  // defines: printf, puts, getchar
+#include <stdlib.h>		  // defines: EXIT_SUCCESS
+#include <string.h>		  // defines: strcmp
+#include <unistd.h>		  // defines: STDIN_FILENO, usleep
 #include <termios.h>	  // defines: termios, TCSANOW, ICANON, ECHO
 #include <stdbool.h>	  // defines: true, false
-#include <stdint.h>	  // defines: uint8_t, uint32_t
-#include <time.h>	  // defines: time
-#include <signal.h>	  // defines: signal, SIGINT
+#include <stdint.h>		  // defines: uint8_t, uint32_t
+#include <time.h>		  // defines: time
+#include <signal.h>		  // defines: signal, SIGINT
 
 #define SIZE 4
-#define VERSION "1.0"
 
 // this function receives 2 pointers (indicated by *) so it can set their values
 void getColors(uint8_t value, uint8_t scheme, uint8_t *foreground, uint8_t *background)
@@ -352,19 +353,19 @@ int test()
 	// these are exponents with base 2 (1=2 2=4 3=8)
 	// data holds per line: 4x IN, 4x OUT, 1x POINTS
 	uint8_t data[] = {
-	    0, 0, 0, 1, 1, 0, 0, 0, 0,
-	    0, 0, 1, 1, 2, 0, 0, 0, 4,
-	    0, 1, 0, 1, 2, 0, 0, 0, 4,
-	    1, 0, 0, 1, 2, 0, 0, 0, 4,
-	    1, 0, 1, 0, 2, 0, 0, 0, 4,
-	    1, 1, 1, 0, 2, 1, 0, 0, 4,
-	    1, 0, 1, 1, 2, 1, 0, 0, 4,
-	    1, 1, 0, 1, 2, 1, 0, 0, 4,
-	    1, 1, 1, 1, 2, 2, 0, 0, 8,
-	    2, 2, 1, 1, 3, 2, 0, 0, 12,
-	    1, 1, 2, 2, 2, 3, 0, 0, 12,
-	    3, 0, 1, 1, 3, 2, 0, 0, 4,
-	    2, 0, 1, 1, 2, 2, 0, 0, 4};
+		0, 0, 0, 1, 1, 0, 0, 0, 0,
+		0, 0, 1, 1, 2, 0, 0, 0, 4,
+		0, 1, 0, 1, 2, 0, 0, 0, 4,
+		1, 0, 0, 1, 2, 0, 0, 0, 4,
+		1, 0, 1, 0, 2, 0, 0, 0, 4,
+		1, 1, 1, 0, 2, 1, 0, 0, 4,
+		1, 0, 1, 1, 2, 1, 0, 0, 4,
+		1, 1, 0, 1, 2, 1, 0, 0, 4,
+		1, 1, 1, 1, 2, 2, 0, 0, 8,
+		2, 2, 1, 1, 3, 2, 0, 0, 12,
+		1, 1, 2, 2, 2, 3, 0, 0, 12,
+		3, 0, 1, 1, 3, 2, 0, 0, 4,
+		2, 0, 1, 1, 2, 2, 0, 0, 4};
 	uint8_t *in, *out, *points;
 	uint8_t t, tests;
 	uint8_t i;
@@ -426,12 +427,6 @@ int test()
 	return !success;
 }
 
-int version()
-{
-    printf("2048.c version %s\n", VERSION);
-    return EXIT_SUCCESS;
-}
-
 void signal_callback_handler(int signum)
 {
 	printf("         TERMINATED         \n");
@@ -439,48 +434,6 @@ void signal_callback_handler(int signum)
 	// make cursor visible, reset all modes
 	printf("\033[?25h\033[m");
 	exit(signum);
-}
-
-struct CliOption
-{
-    char* name;
-    char* description;
-};
-struct CliOption cli_options[] = {
-    {"--help", "Show this help message."},
-    {"--version", "Show version number."},
-    {"bluered", "Use a blue-to-red color scheme (requires 256-color terminal support). If unsupported, it will fall back to black-to-white."},
-    {"blackwhite", "The default color scheme is black-to-white (requires 256-color terminal support)."},
-    {"test", "Run the test suite."},
-};
-
-char* parseArgs(int argc, char* argv[], int* status_code)
-{
-    if (argc == 1)
-    {
-        return "blackwhite";      // default color scheme
-    }
-    else if (argc == 2)
-    {
-        return argv[1];
-    }
-    else
-    {
-        printf("Invalid number of arguments\n");
-        *status_code = EXIT_FAILURE;
-        return "--help";
-    }
-}
-
-int help(int success) {
-    printf("Usage: 2048 [OPTION]\n");
-    printf("Play the game 2048 in the console\n\n");
-    printf("Options:\n");
-    for (int i = 0; i < sizeof(cli_options) / sizeof(cli_options[0]); i++)
-    {
-        printf("  %-12s %s\n", cli_options[i].name, cli_options[i].description);
-    }
-    return success;
 }
 
 int main(int argc, char *argv[])
@@ -491,31 +444,44 @@ int main(int argc, char *argv[])
 	char c;
 	bool success;
 
-    int status_code = EXIT_SUCCESS;
-    char* option = parseArgs(argc, argv, &status_code);
-    if (strcmp(option, "--help") == 0 || strcmp(option, "-h") == 0)
-    {
-        return help(status_code);
-    }
-    else if (strcmp(option, "--version") == 0 || strcmp(option, "-v") == 0)
-    {
-        return version();
-    }
-	else if (strcmp(option, "test") == 0)
+	// handle the command line options
+	if (argc > 1)
 	{
-		return test();
+		if (strcmp(argv[1], "-h") == 0 || strcmp(argv[1], "--help") == 0)
+		{
+			printf("Usage: 2048 [OPTION] | [MODE]\n");
+			printf("Play the game 2048 in the console\n\n");
+			printf("Options:\n");
+			printf("  -h,  --help       Show this help message.\n");
+			printf("  -v,  --version    Show version number.\n\n");
+			printf("Modes:\n");
+			printf("  bluered      Use a blue-to-red color scheme (requires 256-color terminal support).\n");
+			printf("  blackwhite   The black-to-white color scheme (requires 256-color terminal support).\n");
+			return EXIT_SUCCESS;
+		}
+		else if (strcmp(argv[1], "-v") == 0 || strcmp(argv[1], "--version") == 0)
+		{
+			printf("2048.c version %s\n", VERSION);
+			return EXIT_SUCCESS;
+		}
+		else if (strcmp(argv[1], "blackwhite") == 0)
+		{
+			scheme = 1;
+		}
+		else if (strcmp(argv[1], "bluered") == 0)
+		{
+			scheme = 2;
+		}
+		else if (strcmp(argv[1], "test") == 0)
+		{
+			return test();
+		}
+		else
+		{
+			printf("Invalid option: %s\n\nTry '%s --help' for more options.\n", argv[1], argv[0]);
+			return EXIT_FAILURE;
+		}
 	}
-	else if (strcmp(option, "blackwhite") == 0)
-	{
-		scheme = 1;
-	}
-	else if (strcmp(option, "bluered") == 0)
-	{
-		scheme = 2;
-	} else {
-        printf("Invalid option: %s\n", option);
-        return help(EXIT_FAILURE);
-    }
 
 	// make cursor invisible, erase entire screen
 	printf("\033[?25l\033[2J");

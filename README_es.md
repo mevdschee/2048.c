@@ -40,6 +40,7 @@ El juego soporta diferentes esquemas de colores. Esto depende del soporte ANSI p
 ```
 ./2048
 ```
+
 Para el esquema de colores en blanco y negro (requiere 256 colores):
 
 ```
@@ -50,6 +51,18 @@ Para el esquema de colores azul y rojo (requiere 256 colores):
 
 ```
 ./2048 bluered
+```
+
+Mostrar la información de la versión
+
+```
+./2048 --version
+```
+
+Mostrar mensaje de ayuda (muestra todas las opciones de línea de comandos compatibles):
+
+```
+./2048 --help
 ```
 
 ### Contribuciones
