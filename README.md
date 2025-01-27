@@ -52,6 +52,12 @@ For the blue-to-red color scheme (requires 256 colors):
 ./2048 bluered
 ```
 
+Show help message (shows all supported CLI options):
+
+```
+./2048 help
+```
+
 ### Contributing
 
 Contributions are very welcome. Always run the tests before committing using:

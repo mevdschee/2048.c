@@ -447,11 +447,11 @@ struct CliOption
     char* description;
 };
 struct CliOption cli_options[] = {
-    {"--help", "Show this help message"},
-    {"--version", "Show version number"},
-    {"blackwhite", "Use black and white colors"},
-    {"bluered", "Use blue and red colors"},
-    {"test", "Run the test suite"},
+    {"--help", "Show this help message."},
+    {"--version", "Show version number."},
+    {"bluered", "Use a blue-to-red color scheme (requires 256-color terminal support). If unsupported, it will fall back to black-to-white."},
+    {"blackwhite", "The default color scheme is black-to-white (requires 256-color terminal support)."},
+    {"test", "Run the test suite."},
 };
 
 char* parseArgs(int argc, char* argv[], int* status_code)
