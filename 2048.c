@@ -49,7 +49,7 @@ void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 {
 	uint8_t x, y, fg, bg;
 	printf("\033[H"); // move cursor to 0,0
-	printf("2048.c %17d pts\n\n", score);
+	printf("2048.c %17u pts\n\n", score);
 	for (y = 0; y < SIZE; y++)
 	{
 		for (x = 0; x < SIZE; x++)
@@ -166,7 +166,7 @@ void rotateBoard(uint8_t board[SIZE][SIZE])
 	uint8_t tmp;
 	for (i = 0; i < n / 2; i++)
 	{
-		for (j = i; j < n - i - 1; j++)
+		for (j = i; j < (uint8_t)(n - i - 1); j++)
 		{
 			tmp = board[i][j];
 			board[i][j] = board[j][n - i - 1];
@@ -406,7 +406,7 @@ int test()
 			{
 				printf("%d ", array[i]);
 			}
-			printf("(%d points) expected ", score);
+			printf("(%u points) expected ", score);
 			for (i = 0; i < SIZE; i++)
 			{
 				printf("%d ", in[i]);
@@ -441,7 +441,7 @@ int main(int argc, char *argv[])
 	uint8_t board[SIZE][SIZE];
 	uint8_t scheme = 0;
 	uint32_t score = 0;
-	char c;
+	int c;
 	bool success;
 
 	// handle the command line options
@@ -495,7 +495,7 @@ int main(int argc, char *argv[])
 	while (true)
 	{
 		c = getchar();
-		if (c == -1)
+		if (c == EOF)
 		{
 			puts("\nError! Cannot read keyboard input!");
 			break;
