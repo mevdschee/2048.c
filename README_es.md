@@ -73,3 +73,9 @@ Las contribuciones son siempre bienvenidas. Ejecute siempre las pruebas antes de
 $ ./2048 test
 All 13 tests executed successfully
 ```
+
+Compilar con advertencias adicionales usando:
+
+```
+gcc -std=c99 -Wextra -o 2048 2048.c
+```

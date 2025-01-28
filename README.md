@@ -73,3 +73,9 @@ Contributions are very welcome. Always run the tests before committing using:
 $ ./2048 test
 All 13 tests executed successfully
 ```
+
+Compile with extra warnings using:
+
+```
+gcc -std=c99 -Wextra -o 2048 2048.c
+```
