@@ -1,4 +1,4 @@
-CFLAGS += -std=c99
+CFLAGS += -std=c99 -Wextra
 PREFIX ?= /usr
 
 .PHONY: all clean test
