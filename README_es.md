@@ -19,6 +19,14 @@ Testeado en: GNU/Linux, FreeBSD, OpenBSD
 
 ### Instalación
 
+En sistemas Debian (o derivados):
+ 
+```
+sudo apt install 2048
+```
+ 
+O compilar la fuente (recomendado):
+
 ```
 wget https://raw.githubusercontent.com/mevdschee/2048.c/master/2048.c
 gcc -o 2048 2048.c
@@ -32,6 +40,7 @@ El juego soporta diferentes esquemas de colores. Esto depende del soporte ANSI p
 ```
 ./2048
 ```
+
 Para el esquema de colores en blanco y negro (requiere 256 colores):
 
 ```
@@ -44,6 +53,18 @@ Para el esquema de colores azul y rojo (requiere 256 colores):
 ./2048 bluered
 ```
 
+Mostrar la información de la versión
+
+```
+./2048 --version
+```
+
+Mostrar mensaje de ayuda (muestra todas las opciones de línea de comandos compatibles):
+
+```
+./2048 --help
+```
+
 ### Contribuciones
 
 Las contribuciones son siempre bienvenidas. Ejecute siempre las pruebas antes de hacer commit usando:
@@ -51,4 +72,10 @@ Las contribuciones son siempre bienvenidas. Ejecute siempre las pruebas antes de
 ```
 $ ./2048 test
 All 13 tests executed successfully
+```
+
+Compilar con advertencias adicionales usando:
+
+```
+gcc -std=c99 -Wextra -o 2048 2048.c
 ```
