@@ -502,21 +502,25 @@ int main(int argc, char *argv[])
 		}
 		switch (c)
 		{
+		case 52:  // '4' key
 		case 97:  // 'a' key
 		case 104: // 'h' key
 		case 68:  // left arrow
 			success = moveLeft(board, &score);
 			break;
+		case 54:  // '6' key
 		case 100: // 'd' key
 		case 108: // 'l' key
 		case 67:  // right arrow
 			success = moveRight(board, &score);
 			break;
+		case 56:  // '8' key
 		case 119: // 'w' key
 		case 107: // 'k' key
 		case 65:  // up arrow
 			success = moveUp(board, &score);
 			break;
+		case 50:  // '2' key
 		case 115: // 's' key
 		case 106: // 'j' key
 		case 66:  // down arrow
