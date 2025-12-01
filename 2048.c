@@ -75,7 +75,8 @@ uint8_t getDigitCount(uint32_t number)
 void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
 {
 	uint8_t x, y, fg, bg;
-	printf("\033[H"); // move cursor to 0,0
+	printf("\033[?25l"); // hide cursor again due to reset vty
+	printf("\033[H");	 // move cursor to 0,0
 	PRINT_HEAD(score);
 	for (y = 0; y < SIZE; y++)
 	{
