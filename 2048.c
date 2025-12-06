@@ -18,6 +18,8 @@
 #include <stdint.h>		  // defines: uint8_t, uint32_t
 #include <time.h>		  // defines: time
 #include <signal.h>		  // defines: signal, SIGINT
+#include <libintl.h>	  // defines: number format
+#include <locale.h>
 
 #if defined(SIZE) && ((SIZE < 4) || (SIZE > 9))
 #warning "The board ranges from 4x4 to 9x9, default to 4x4"
@@ -29,14 +31,14 @@
 
 #define ROW_WIDTH (SIZE * 7)
 
-#define PRINT_HEAD(score)                                  \
-	do                                                     \
-	{                                                      \
-		char fmt[48];                                      \
-		uint8_t len = ROW_WIDTH - 11;                      \
-		len = sprintf(fmt, "\n2048.c %%%du pts\n\n", len); \
-		fmt[len] = '\0';                                   \
-		printf(fmt, score);                                \
+#define PRINT_HEAD(score)                                    \
+	do                                                       \
+	{                                                        \
+		char fmt[48];                                        \
+		uint8_t len = ROW_WIDTH - 11;                        \
+		len = sprintf(fmt, "\n2048.c %%\'%du pts\n\n", len); \
+		fmt[len] = '\0';                                     \
+		printf(fmt, score);                                  \
 	} while (0)
 
 #define PRINT_FOOT(str, len)                   \
@@ -514,6 +516,10 @@ key_map_t key_map(char c, bool termux)
 		return OTHER;
 	}
 }
+char rand_key()
+{
+	return "asd"[rand() % 3]; // left down right
+}
 
 int main(int argc, char *argv[])
 {
@@ -523,6 +529,7 @@ int main(int argc, char *argv[])
 	int c;
 	bool success;
 	bool termux;
+	bool demo;
 
 	// handle the command line options
 	if (argc > 1)
@@ -556,6 +563,10 @@ int main(int argc, char *argv[])
 		{
 			return testSucceed() ? EXIT_SUCCESS : EXIT_FAILURE;
 		}
+		else if (strcmp(argv[1], "demo") == 0)
+		{
+			demo = true;
+		}
 		else
 		{
 			printf("Invalid option: %s\n\nTry '%s --help' for more options.\n", argv[1], argv[0]);
@@ -564,7 +575,7 @@ int main(int argc, char *argv[])
 	}
 
 	termux = getenv("TERMUX__PREFIX") != NULL ? true : false;
-
+	setlocale(LC_NUMERIC, "en_US");
 	// make cursor invisible, erase entire screen
 	printf("\033[?25l\033[2J");
 
@@ -577,7 +588,7 @@ int main(int argc, char *argv[])
 
 	while (true)
 	{
-		c = getchar();
+		c = demo ? rand_key() : getchar();
 		if (c == EOF)
 		{
 			puts("\nError! Cannot read keyboard input!");
@@ -606,7 +617,7 @@ int main(int argc, char *argv[])
 		if (success)
 		{
 			drawBoard(board, scheme, score);
-			usleep(150 * 1000); // 150 ms
+			usleep((demo ? 1 : 150) * 1000); // 1 or 150 ms
 			addRandom(board);
 			drawBoard(board, scheme, score);
 			if (gameEnded(board))
