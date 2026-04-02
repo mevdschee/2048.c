@@ -47,6 +47,12 @@ For the black-to-white color scheme (requires 256 colors):
 ./2048 blackwhite
 ```
 
+For the white-to-black color scheme (requires 256 colors):
+
+```
+./2048 whiteblack
+```
+
 For the blue-to-red color scheme (requires 256 colors):
 
 ```

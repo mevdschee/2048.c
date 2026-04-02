@@ -47,6 +47,12 @@ Para el esquema de colores en blanco y negro (requiere 256 colores):
 ./2048 blackwhite
 ```
 
+Para el esquema de colores en negro y blanco (requiere 256 colores):
+
+```
+./2048 whiteblack
+```
+
 Para el esquema de colores azul y rojo (requiere 256 colores):
 
 ```
