@@ -474,9 +474,9 @@ int main(int argc, char *argv[])
 			scheme = 2;
 		}
 		else if (strcmp(argv[1], "whiteblack") == 0)
-        {
-            scheme = 3;
-        }
+		{
+			scheme = 3;
+		}
 		else if (strcmp(argv[1], "test") == 0)
 		{
 			return testSucceed() ? EXIT_SUCCESS : EXIT_FAILURE;
