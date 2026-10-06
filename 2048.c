@@ -21,6 +21,11 @@
 
 #define SIZE 4
 
+#define C_ARROW_UP 65
+#define C_ARROW_DOWN 66
+#define C_ARROW_RIGHT 67
+#define C_ARROW_LEFT 68
+
 // this function receives 2 pointers (indicated by *) so it can set their values
 void getColors(uint8_t value, uint8_t scheme, uint8_t *foreground, uint8_t *background)
 {
@@ -44,6 +49,33 @@ uint8_t getDigitCount(uint32_t number)
 		count += 1;
 	} while (number);
 	return count;
+}
+
+const char *getSaveFilePath()
+{
+	static char saveFilePath[512];
+
+	const char *homeDir = getenv("HOME");
+
+	if (homeDir == NULL)
+	{
+		return "";
+	}
+
+	snprintf(saveFilePath, sizeof(saveFilePath), "%s/.local/share/2048.save", homeDir);
+
+	return saveFilePath;
+}
+
+bool fileExist(const char *path)
+{
+	FILE *file = fopen(path, "rb");
+	if (file != NULL)
+	{
+		fclose(file);
+		return true;
+	}
+	return false;
 }
 
 void drawBoard(uint8_t board[SIZE][SIZE], uint8_t scheme, uint32_t score)
@@ -306,6 +338,38 @@ void addRandom(uint8_t board[SIZE][SIZE])
 	}
 }
 
+bool loadGame(const char *path, uint8_t board[SIZE][SIZE], uint32_t *score)
+{
+	FILE *file = fopen(path, "rb");
+
+	if (file == NULL)
+	{
+		return false;
+	}
+
+	fread(score, sizeof(*score), 1, file);
+	fread(board, sizeof(uint8_t), SIZE * SIZE, file);
+	fclose(file);
+
+	return true;
+}
+
+bool saveGame(const char *path, uint8_t board[SIZE][SIZE], uint32_t score)
+{
+	FILE *file = fopen(path, "wb");
+
+	if (file == NULL)
+	{
+		return false;
+	}
+
+	fwrite(&score, sizeof(score), 1, file);
+	fwrite(board, sizeof(uint8_t), SIZE * SIZE, file);
+	fclose(file);
+
+	return true;
+}
+
 void initBoard(uint8_t board[SIZE][SIZE])
 {
 	uint8_t x, y;
@@ -444,6 +508,8 @@ int main(int argc, char *argv[])
 	uint32_t score = 0;
 	int c;
 	bool success;
+	bool needToInitGame = true;
+	const char *saveFilePath = getSaveFilePath();
 
 	// handle the command line options
 	if (argc > 1)
@@ -488,15 +554,43 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	// make cursor invisible, erase entire screen
-	printf("\033[?25l\033[2J");
-
 	// register signal handler for when ctrl-c is pressed
 	signal(SIGINT, signal_callback_handler);
 
-	initBoard(board);
 	setBufferedInput(false);
+
+	if (fileExist(saveFilePath))
+	{
+		printf("A saved game was found. Would you like to load it? (y/n)\n");
+		c = getchar();
+		if (c == 'y')
+		{
+			if (loadGame(saveFilePath, board, &score))
+			{
+				needToInitGame = false;
+			}
+			else
+			{
+				printf("Failed to load the game. Press any key to start a new game.\n");
+				getchar();
+			}
+		}
+		else
+		{
+			remove(saveFilePath);
+		}
+	}
+
+	if (needToInitGame)
+	{
+		initBoard(board);
+	}
+
+	// make cursor invisible, erase entire screen
+	printf("\033[?25l\033[2J");
+
 	drawBoard(board, scheme, score);
+
 	while (true)
 	{
 		c = getchar();
@@ -507,28 +601,28 @@ int main(int argc, char *argv[])
 		}
 		switch (c)
 		{
-		case 52:  // '4' key
-		case 97:  // 'a' key
-		case 104: // 'h' key
-		case 68:  // left arrow
+		case '4':
+		case 'a':
+		case 'h':
+		case C_ARROW_LEFT:
 			success = moveLeft(board, &score);
 			break;
-		case 54:  // '6' key
-		case 100: // 'd' key
-		case 108: // 'l' key
-		case 67:  // right arrow
+		case '6':
+		case 'd':
+		case 'l':
+		case C_ARROW_RIGHT:
 			success = moveRight(board, &score);
 			break;
-		case 56:  // '8' key
-		case 119: // 'w' key
-		case 107: // 'k' key
-		case 65:  // up arrow
+		case '8':
+		case 'w':
+		case 'k':
+		case C_ARROW_UP:
 			success = moveUp(board, &score);
 			break;
-		case 50:  // '2' key
-		case 115: // 's' key
-		case 106: // 'j' key
-		case 66:  // down arrow
+		case '2':
+		case 's':
+		case 'j':
+		case C_ARROW_DOWN:
 			success = moveDown(board, &score);
 			break;
 		default:
@@ -548,13 +642,21 @@ int main(int argc, char *argv[])
 		}
 		if (c == 'q')
 		{
-			printf("        QUIT? (y/n)         \n");
-			c = getchar();
-			if (c == 'y')
+			if (saveGame(saveFilePath, board, score))
 			{
+				printf("\nGame saved successfully. Quitting...\n");
 				break;
 			}
-			drawBoard(board, scheme, score);
+			else
+			{
+				printf("Failed to save the game. Quit anyway? (y/n)\n");
+				c = getchar();
+				if (c == 'y')
+				{
+					break;
+				}
+				drawBoard(board, scheme, score);
+			}
 		}
 		if (c == 'r')
 		{
